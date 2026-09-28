@@ -196,7 +196,7 @@ section.panel.active{display:block;}
 /* Calculator */
 .calc-row{display:flex; flex-direction:column; gap:6px; margin-bottom:14px;}
 .calc-row label{font-size:12px; text-transform:uppercase; letter-spacing:.04em; color:var(--ink-soft);}
-select, input[type="number"], input[type="time"], input[type="text"]{
+select, input[type="number"], input[type="time"], input[type="text"], input[type="datetime-local"]{
   font:inherit;
   font-size:16px;
   padding:11px 12px;
@@ -424,10 +424,25 @@ footer{text-align:center; font-size:11.5px; color:var(--ink-soft); padding:22px 
     <div class="rng" id="resultWindow"></div>
     <div class="sub" id="resultSub"></div>
   </div>
+
+  <div class="card" style="margin-top:20px;">
+    <h3 style="font-size:14px; margin-bottom:4px;">Feeds How Many?</h3>
+    <p class="pairs" style="margin-bottom:12px;">Pick your meats and headcount — get back how many raw pounds to buy. Figures assume BBQ as the main, with sides on the table.</p>
+    <div class="calc-row">
+      <label for="guestCount">Guests</label>
+      <input type="number" id="guestCount" min="1" step="1" value="10">
+    </div>
+    <div class="chip-row" id="feedsChips"></div>
+    <div class="result" id="feedsResultWrap" style="display:none;">
+      <div class="rng">SHOPPING LIST</div>
+      <div id="feedsBreakdown" style="text-align:left; margin-top:10px; font-size:14px; line-height:1.9;"></div>
+      <div class="sub" id="feedsTotal"></div>
+    </div>
+  </div>
 </section>
 
 <section class="panel" id="panel-track">
-  <p class="lede">Start a live cook and track it in real time — the estimate keeps running even if you close the app and come back later.</p>
+  <p class="lede">Track as many cooks as you've got going at once — brisket at 2am, ribs at 9, chicken at noon. Each one keeps its own live countdown, even if you close the app and come back later. Mark a cook done to rate it and jot down what worked, so next time you're not guessing.</p>
   <div id="trackBody"></div>
   <div id="trackHistory"></div>
 </section>
@@ -435,26 +450,21 @@ footer{text-align:center; font-size:11.5px; color:var(--ink-soft); padding:22px 
 <section class="panel" id="panel-fire">
   <p class="lede">Two zones, not one temperature. Where you set the meat down matters as much as what temp you're running.</p>
   <div class="zone-wrap">
-    <svg viewBox="0 0 340 130" role="img" aria-label="Diagram of an offset smoker showing hot zone near the firebox and cool zone near the stack">
-      <rect x="0" y="30" width="340" height="70" rx="10" fill="var(--surface-2)"/>
-      <rect x="0" y="30" width="120" height="70" rx="10" fill="var(--ember)" opacity="0.22"/>
-      <rect x="220" y="30" width="120" height="70" rx="10" fill="var(--good)" opacity="0.18"/>
-      <circle cx="26" cy="65" r="15" fill="var(--ember)"/>
-      <path d="M26 50c4 5 7 8 7 12a7 7 0 1 1-14 0c0-4 3-7 7-12Z" fill="#fff8f0" opacity=".55"/>
-      <text x="26" y="112" text-anchor="middle" font-family="Oswald" font-size="10" fill="var(--ink-soft)">FIREBOX</text>
-      <rect x="70" y="52" width="36" height="18" rx="4" fill="var(--char)"/>
-      <text x="88" y="88" text-anchor="middle" font-family="Oswald" font-size="9" fill="var(--ink-soft)">BRISKET /</text>
-      <text x="88" y="98" text-anchor="middle" font-family="Oswald" font-size="9" fill="var(--ink-soft)">PORK BUTT</text>
-      <rect x="150" y="52" width="36" height="18" rx="4" fill="var(--char)" opacity=".85"/>
-      <text x="168" y="88" text-anchor="middle" font-family="Oswald" font-size="9" fill="var(--ink-soft)">RIBS</text>
-      <rect x="240" y="52" width="36" height="18" rx="4" fill="var(--char)" opacity=".7"/>
-      <text x="258" y="88" text-anchor="middle" font-family="Oswald" font-size="9" fill="var(--ink-soft)">CHICKEN /</text>
-      <text x="258" y="98" text-anchor="middle" font-family="Oswald" font-size="9" fill="var(--ink-soft)">SAUSAGE</text>
-      <rect x="316" y="20" width="14" height="55" rx="4" fill="var(--surface-2)" stroke="var(--line)"/>
-      <text x="323" y="112" text-anchor="middle" font-family="Oswald" font-size="9" fill="var(--ink-soft)">STACK</text>
+    <svg viewBox="0 0 340 160" role="img" aria-label="Diagram of an offset smoker showing hot, middle, and cool zones with every cut placed in its zone">
+      <rect x="0" y="20" width="340" height="100" rx="10" fill="var(--surface-2)"/>
+      <rect x="0" y="20" width="110" height="100" rx="10" fill="var(--ember)" opacity="0.22"/>
+      <rect x="110" y="20" width="110" height="100" fill="var(--mustard)" opacity="0.18"/>
+      <rect x="220" y="20" width="120" height="100" rx="10" fill="var(--good)" opacity="0.18"/>
+      <circle cx="26" cy="58" r="15" fill="var(--ember)"/>
+      <path d="M26 43c4 5 7 8 7 12a7 7 0 1 1-14 0c0-4 3-7 7-12Z" fill="#fff8f0" opacity=".55"/>
+      <text x="26" y="140" text-anchor="middle" font-family="Oswald" font-size="10" fill="var(--ink-soft)">FIREBOX</text>
+      <rect x="316" y="14" width="14" height="60" rx="4" fill="var(--surface-2)" stroke="var(--line)"/>
+      <text x="323" y="140" text-anchor="middle" font-family="Oswald" font-size="9" fill="var(--ink-soft)">STACK</text>
+      <g id="fireZoneMeats"></g>
     </svg>
     <div class="legend">
       <span><span class="dot" style="background:var(--ember)"></span> Hot zone — closest to the fire</span>
+      <span><span class="dot" style="background:var(--mustard)"></span> Middle zone</span>
       <span><span class="dot" style="background:var(--good)"></span> Cool zone — near the stack</span>
     </div>
   </div>
@@ -466,6 +476,7 @@ footer{text-align:center; font-size:11.5px; color:var(--ink-soft); padding:22px 
     <div class="rule"><div class="n">5</div><p><b>A water pan between fire and meat</b> buffers temperature spikes and keeps the cool zone from drying out — put it in the middle of the chamber, not right under any one cut.</p></div>
     <div class="rule"><div class="n">6</div><p><b>Probe the thickest part, away from bone and fat.</b> Bone reads hotter, fat reads slower — either one will lie to you about doneness.</p></div>
   </div>
+  <div id="zoneRef"></div>
 </section>
 
 <section class="panel" id="panel-wood">
@@ -491,6 +502,15 @@ footer{text-align:center; font-size:11.5px; color:var(--ink-soft); padding:22px 
   <p class="lede">Run through this before the fire's lit. Check things off as you go — it remembers, and resets clean for the next cook.</p>
   <button type="button" class="filter-chip" id="prepResetBtn" style="margin-bottom:14px;">Reset Checklist</button>
   <div id="prepList"></div>
+
+  <div class="card" style="margin-top:20px;">
+    <h3 style="font-size:14px; margin-bottom:10px;">After the Cook: Storage &amp; Reheat</h3>
+    <div class="pairs" style="margin-bottom:10px;"><b>Cooling down:</b> Don't let smoked meat sit out past 2 hours (1 hour if it's above 90°F outside). Slice or pull what you're serving now, and get the rest into the fridge or a cooler with ice.</div>
+    <div class="pairs" style="margin-bottom:10px;"><b>Fridge (3–4 days):</b> Wrap tight in foil or a vacuum bag, add a splash of leftover juice or broth before sealing — it dries out fast once it's off the smoker.</div>
+    <div class="pairs" style="margin-bottom:10px;"><b>Freezer (2–3 months):</b> Vacuum seal if you can. Portion it first — you'll want to thaw one meal at a time, not the whole brisket.</div>
+    <div class="pairs" style="margin-bottom:10px;"><b>Reheating low and slow:</b> Wrap in foil with a splash of broth, oven at 250°F until it hits about 165°F internal. Slow is what keeps it from drying out — resist the microwave for anything sliced.</div>
+    <div class="pairs"><b>Reheating fast:</b> Sauce-covered or saucy cuts (pulled pork, chopped brisket) hold up fine in the microwave, covered, in short bursts. Bark-forward cuts like ribs or sliced brisket do better finished under a broiler or back on the smoker for 15–20 min.</div>
+  </div>
 </section>
 
 <section class="panel" id="panel-score">
@@ -532,7 +552,7 @@ const MEATS = [
     pull:"195–204°F", rest:"1–2 hr (cooler rest)",
     tip:"Stalls hard around 150–170°F for hours — that's the collagen breaking down, not a problem. Wrap in butcher paper to push through if you're racing daylight.",
     placement:"Fat cap toward the firebox, point end closest to the heat, flat end farther back.",
-    sauces:["texas","kc"]
+    sauces:["texas","kc"], zone:"hot", perLow:0.5, perHigh:0.75, short:"Brisket"
   },
   {
     id:"porkbutt", name:"Pork Butt", sub:"Bone-in shoulder, for pulling",
@@ -541,7 +561,7 @@ const MEATS = [
     pull:"203–205°F", rest:"30–60 min",
     tip:"Forgiving — it's hard to overcook this one before it turns to mush. If in doubt, give it more time, not less.",
     placement:"Fat cap up, mid heat zone. It renders down over the whole cook and self-bastes.",
-    sauces:["carolina-vinegar","carolina-mustard","kc"]
+    sauces:["carolina-vinegar","carolina-mustard","kc"], zone:"hot", perLow:0.5, perHigh:0.65, short:"Pork Butt"
   },
   {
     id:"ribs", name:"Spare Ribs", sub:"St. Louis cut, per rack",
@@ -550,7 +570,7 @@ const MEATS = [
     pull:"Bend test — probe slides like butter (~195–203°F)", rest:"10–15 min",
     tip:"3-2-1 works well here: 3 hr smoking, 2 hr wrapped, 1 hr unwrapped to set the bark. Judge by bend, not just the thermometer.",
     placement:"Bone side down toward the hot side for the first hour, then rotate meaty-side toward the heat.",
-    sauces:["kc","memphis"]
+    sauces:["kc","memphis"], zone:"mid", perLow:0.75, perHigh:1, short:"Ribs"
   },
   {
     id:"chicken", name:"Whole Chicken", sub:"4–5 lb bird",
@@ -559,7 +579,7 @@ const MEATS = [
     pull:"165°F breast / 175°F thigh", rest:"15 min",
     tip:"Runs hot and quick — the higher smoker temp keeps the skin from turning rubbery.",
     placement:"Keep it in the cool zone near the stack, away from the direct hot point — it dries out fast if it sits too close.",
-    sauces:["alabama-white","kc"]
+    sauces:["alabama-white","kc"], zone:"cool", perLow:0.75, perHigh:1, short:"Chicken"
   },
   {
     id:"sausage", name:"Sausage", sub:"Fresh links, per string",
@@ -568,7 +588,7 @@ const MEATS = [
     pull:"160°F", rest:"5 min",
     tip:"Add it later in the cook — it doesn't need the hours the big cuts do, and it'll split if it sits over a hot spot too long.",
     placement:"Cool zone, away from direct heat. Casings split fast when it's too close to the fire.",
-    sauces:["carolina-mustard","alabama-white"]
+    sauces:["carolina-mustard","alabama-white"], zone:"cool", perLow:0.33, perHigh:0.5, short:"Sausage"
   },
   {
     id:"wings", name:"Wings", sub:"2–3 lb batch",
@@ -577,7 +597,34 @@ const MEATS = [
     pull:"175°F (past food-safe, for better texture)", rest:"5 min",
     tip:"The higher temp is what gets the skin from rubbery to snappy — don't run these low and slow.",
     placement:"Outer edge of the grate, rotate halfway for even crisping.",
-    sauces:["alabama-white","kc"]
+    sauces:["alabama-white","kc"], zone:"cool", perLow:0.5, perHigh:0.75, short:"Wings"
+  },
+  {
+    id:"turkey", name:"Whole Turkey", sub:"10–14 lb bird",
+    icon:'<circle cx="9" cy="14" r="5"/><circle cx="7" cy="9" r="2"/><path d="M13 11c2-1.5 4-2 6-1.5"/><path d="M13 14c2-.3 4 0 6 1"/><path d="M13 17c2 .7 4 1.5 5 2.5"/>',
+    smoker:"275–300°F (higher heat, faster cook)", weight:"10–14 lb", timeMode:"perLb", timeLow:0.25, timeHigh:0.35,
+    pull:"165°F breast / 175°F thigh", rest:"20–30 min",
+    tip:"Lean and prone to drying out — a brine, or at least a heavy salt rest the day before, makes a real difference. Tent the breast with foil if it's coloring faster than the thighs are cooking.",
+    placement:"Cool zone near the stack, same logic as chicken — it dries out fast if it sits too close to the fire.",
+    sauces:["alabama-white","kc","georgia-peach"], zone:"cool", perLow:1, perHigh:1.25, short:"Turkey"
+  },
+  {
+    id:"goat", name:"Goat Shoulder", sub:"Bone-in, for pulling (cabrito style)",
+    icon:'<circle cx="12" cy="13" r="6"/><path d="M8 8c-1.5-2-1-4 1-5"/><path d="M16 8c1.5-2 1-4-1-5"/><circle cx="9.5" cy="13" r=".6" fill="var(--ember)" stroke="none"/><circle cx="14.5" cy="13" r=".6" fill="var(--ember)" stroke="none"/>',
+    smoker:"225–250°F", weight:"6–8 lb", timeMode:"perLb", timeLow:1.5, timeHigh:2,
+    pull:"195–203°F", rest:"30–45 min",
+    tip:"Very lean compared to pork — it can dry out before it fully breaks down. Wrap earlier than you would a pork butt, and don't be afraid to add a splash of broth under the paper.",
+    placement:"Mid heat zone, similar to pork butt — it needs the sustained heat to break down the connective tissue.",
+    sauces:["newmexico-hatch","texas","louisiana-cajunfire"], zone:"hot", perLow:0.65, perHigh:0.85, short:"Goat"
+  },
+  {
+    id:"lamb", name:"Leg of Lamb", sub:"Bone-in, 5–7 lb",
+    icon:'<path d="M6 14a6 6 0 0 1 12 0c0 2.5-1.5 4.5-2 5H8c-.5-.5-2-2.5-2-5Z"/><path d="M6.5 10c-1-1-1-2.5 0-3.5"/><path d="M17.5 10c1-1 1-2.5 0-3.5"/><path d="M8 7.5c1-.8 2.5-.8 4-.8s3 0 4 .8"/>',
+    smoker:"225–250°F", weight:"5–7 lb", timeMode:"perLb", timeLow:0.5, timeHigh:0.65,
+    pull:"135–145°F (medium-rare to medium)", rest:"15–20 min",
+    tip:"This isn't a low-and-slow collagen cut like brisket — pull it well before you'd pull a shreddable cut, or it turns gray and gamey. Treat the temperature target like a roast, not a shred.",
+    placement:"Mid-to-cool zone — it doesn't need the max heat exposure that brisket or pork butt does.",
+    sauces:["minnesota-lingonberry","virginia-piedmont","newhampshire-granite"], zone:"mid", perLow:0.5, perHigh:0.65, short:"Lamb"
   }
 ];
 
@@ -947,6 +994,47 @@ function initCalc(){
   runCalc();
 }
 
+const feedsSelected = new Set(["brisket","ribs","chicken"]);
+function renderFeedsChips(){
+  const wrap = document.getElementById('feedsChips');
+  if(!wrap) return;
+  wrap.innerHTML = MEATS.map(m => `
+    <button type="button" class="filter-chip feeds-chip ${feedsSelected.has(m.id) ? "active" : ""}" data-id="${m.id}">${m.name}</button>
+  `).join("");
+  wrap.querySelectorAll('.feeds-chip').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const id = btn.dataset.id;
+      if(feedsSelected.has(id)) feedsSelected.delete(id); else feedsSelected.add(id);
+      btn.classList.toggle('active', feedsSelected.has(id));
+      runFeeds();
+    });
+  });
+}
+function runFeeds(){
+  const guests = Math.max(1, parseInt(document.getElementById('guestCount').value, 10) || 0);
+  const wrap = document.getElementById('feedsResultWrap');
+  const chosen = MEATS.filter(m => feedsSelected.has(m.id));
+  if(!chosen.length){
+    wrap.style.display = "none";
+    return;
+  }
+  wrap.style.display = "";
+  let totalLow = 0, totalHigh = 0;
+  document.getElementById('feedsBreakdown').innerHTML = chosen.map(m => {
+    const low = (m.perLow * guests);
+    const high = (m.perHigh * guests);
+    totalLow += low; totalHigh += high;
+    return `<div style="display:flex; justify-content:space-between; gap:10px;"><span>${m.name}</span><b style="font-family:'JetBrains Mono';">${low.toFixed(1)}–${high.toFixed(1)} lb</b></div>`;
+  }).join("");
+  document.getElementById('feedsTotal').textContent =
+    `~${totalLow.toFixed(1)}–${totalHigh.toFixed(1)} lb raw meat total for ${guests} ${guests === 1 ? "guest" : "guests"}. Buy toward the high end for a crowd that's hungry, or if you want leftovers.`;
+}
+function initFeeds(){
+  renderFeedsChips();
+  document.getElementById('guestCount').addEventListener('input', runFeeds);
+  runFeeds();
+}
+
 function initScore(){
   const app = document.getElementById('sApp'), taste = document.getElementById('sTaste'), tender = document.getElementById('sTender');
   const vApp = document.getElementById('vApp'), vTaste = document.getElementById('vTaste'), vTender = document.getElementById('vTender');
@@ -980,6 +1068,57 @@ function renderWoods(){
       <p class="pairs"><b>Best with:</b> ${w.best}</p>
     </div>
   `).join("");
+}
+
+const ZONE_LABELS = {
+  hot:  "Hot Zone — closest to the fire",
+  mid:  "Middle Zone",
+  cool: "Cool Zone — near the stack"
+};
+const FIRE_ZONE_LAYOUT = {
+  hot:  { cx:80,  plateX:48,  plateWidth:64 },
+  mid:  { cx:165, plateX:128, plateWidth:74 },
+  cool: { cx:266, plateX:226, plateWidth:80 }
+};
+function renderFireZoneDiagram(){
+  const g = document.getElementById('fireZoneMeats');
+  if(!g) return;
+  const order = ["hot","mid","cool"];
+  const lineHeight = 13;
+  const bandCenterY = 70;
+  let svg = "";
+  order.forEach(z => {
+    const names = MEATS.filter(m => m.zone === z).map(m => (m.short || m.name).toUpperCase());
+    if(!names.length) return;
+    const layout = FIRE_ZONE_LAYOUT[z];
+    const blockHeight = names.length * lineHeight;
+    const plateHeight = blockHeight + 10;
+    const plateY = bandCenterY - plateHeight/2;
+    svg += `<rect x="${layout.plateX}" y="${plateY}" width="${layout.plateWidth}" height="${plateHeight}" rx="6" fill="var(--char)" opacity=".82"/>`;
+    const startY = bandCenterY - blockHeight/2 + lineHeight - 4;
+    names.forEach((n, i) => {
+      const y = startY + i*lineHeight;
+      svg += `<text x="${layout.cx}" y="${y}" text-anchor="middle" font-family="Oswald" font-size="9.5" fill="var(--on-char)">${n}</text>`;
+    });
+  });
+  g.innerHTML = svg;
+}
+
+function renderZoneRef(){
+  const wrap = document.getElementById('zoneRef');
+  if(!wrap) return;
+  const order = ["hot","mid","cool"];
+  wrap.innerHTML = `
+    <div class="card">
+      <h3 style="font-size:14px; margin-bottom:10px;">Quick Reference: Where Every Cut Goes</h3>
+      ${order.map(z => `
+        <div class="pairs" style="margin-bottom:8px;">
+          <b style="color:var(--ember-deep, var(--ember));">${ZONE_LABELS[z]}:</b>
+          ${MEATS.filter(m => m.zone === z).map(m => m.name).join(", ")}
+        </div>
+      `).join("")}
+    </div>
+  `;
 }
 
 function loadPrepState(){
@@ -1019,13 +1158,25 @@ function initPrep(){
   });
 }
 
-function loadActiveCook(){
-  try{ return JSON.parse(localStorage.getItem('scarbq-activecook')); }catch(e){ return null; }
+function loadActiveCooks(){
+  try{ return JSON.parse(localStorage.getItem('scarbq-activecooks')) || []; }catch(e){ return []; }
 }
-function saveActiveCook(data){
+const finishingCooks = new Set();
+const finishRatings = {};
+function saveActiveCooks(list){
+  try{ localStorage.setItem('scarbq-activecooks', JSON.stringify(list)); }catch(e){}
+}
+function migrateActiveCook(){
   try{
-    if(data) localStorage.setItem('scarbq-activecook', JSON.stringify(data));
-    else localStorage.removeItem('scarbq-activecook');
+    const old = localStorage.getItem('scarbq-activecook');
+    if(old && !localStorage.getItem('scarbq-activecooks')){
+      const parsed = JSON.parse(old);
+      if(parsed){
+        parsed.id = "legacy-" + Date.now();
+        localStorage.setItem('scarbq-activecooks', JSON.stringify([parsed]));
+      }
+    }
+    if(old) localStorage.removeItem('scarbq-activecook');
   }catch(e){}
 }
 function loadCookHistory(){
@@ -1049,79 +1200,207 @@ function fmtElapsedHours(hr){
   const m = Math.round((hr - h) * 60);
   return `${h}h ${m}m`;
 }
+function localDatetimeValue(d){
+  const pad = n => String(n).padStart(2,"0");
+  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
 
-function renderTrackBody(){
-  const wrap = document.getElementById('trackBody');
-  const active = loadActiveCook();
+function cookCardHtml(cook){
+  const meat = MEATS.find(m => m.id === cook.meatId);
+  const est = estimateHours(meat, cook.weight);
+  const now = Date.now();
+  const scheduled = cook.startTime > now;
+  const startDate = new Date(cook.startTime);
+  const doneLow = new Date(cook.startTime + est.low*3600000);
+  const doneHigh = new Date(cook.startTime + est.high*3600000);
 
-  if(!active){
-    wrap.innerHTML = `
+  if(scheduled){
+    const untilStartHr = (cook.startTime - now) / 3600000;
+    return `
       <div class="card">
-        <div class="calc-row">
-          <label for="trackMeat">Meat</label>
-          <select id="trackMeat"></select>
+        <div class="meat-head" style="margin-bottom:10px;">
+          <div>
+            <h3>${meat.name}</h3>
+            <span>${cook.weight} lb · scheduled for ${fmtClockFromDate(startDate)}</span>
+          </div>
         </div>
-        <div class="calc-row">
-          <label for="trackWeight">Weight (lb)</label>
-          <input type="number" id="trackWeight" min="0.5" step="0.5" value="10">
+        <div class="result" style="margin-bottom:12px;">
+          <div class="rng">STARTS IN</div>
+          <div class="big">${fmtElapsedHours(untilStartHr)}</div>
+          <div class="rng">Estimated done ${fmtClockFromDate(doneLow)}–${fmtClockFromDate(doneHigh)}</div>
         </div>
-        <button type="button" class="filter-chip" id="trackStartBtn" style="width:100%; text-align:center; padding:12px; font-size:14px;">Start This Cook</button>
+        <div style="display:flex; gap:8px;">
+          <button type="button" class="filter-chip track-startnow-btn" data-id="${cook.id}" style="flex:1; text-align:center; padding:10px;">Start Now Instead</button>
+          <button type="button" class="filter-chip track-cancel-btn" data-id="${cook.id}" style="flex:none; text-align:center; padding:10px; opacity:.7;">Cancel</button>
+        </div>
       </div>
     `;
-    document.getElementById('trackMeat').innerHTML = MEATS.map(m => `<option value="${m.id}">${m.name}</option>`).join("");
-    document.getElementById('trackStartBtn').addEventListener('click', () => {
-      const meatId = document.getElementById('trackMeat').value;
-      const weight = parseFloat(document.getElementById('trackWeight').value) || 0;
-      saveActiveCook({meatId, weight, startTime: Date.now()});
-      renderTrackBody();
-    });
-    return;
   }
 
-  const meat = MEATS.find(m => m.id === active.meatId);
-  const est = estimateHours(meat, active.weight);
-  const elapsedHr = (Date.now() - active.startTime) / 3600000;
+  if(finishingCooks.has(cook.id)){
+    const rating = finishRatings[cook.id] || 0;
+    return `
+      <div class="card">
+        <div class="meat-head" style="margin-bottom:10px;">
+          <div>
+            <h3>${meat.name}</h3>
+            <span>${cook.weight} lb · how'd it turn out?</span>
+          </div>
+        </div>
+        <div class="calc-row">
+          <label>Rating (optional)</label>
+          <div class="chip-row finish-rating" data-id="${cook.id}" style="margin:0;">
+            ${[1,2,3,4,5].map(n => `<button type="button" class="filter-chip finish-rate-btn ${n<=rating ? "active" : ""}" data-id="${cook.id}" data-n="${n}" style="padding:8px 13px;">${n}</button>`).join("")}
+          </div>
+        </div>
+        <div class="calc-row">
+          <label for="doneNotes-${cook.id}">Notes (optional) — wood used, rub, what you'd change next time</label>
+          <textarea id="doneNotes-${cook.id}" rows="3" style="font:inherit; font-size:16px; padding:11px 12px; border-radius:10px; border:1px solid var(--line); background:var(--surface); color:var(--ink); width:100%; resize:vertical;"></textarea>
+        </div>
+        <div style="display:flex; gap:8px;">
+          <button type="button" class="filter-chip track-savefinish-btn" data-id="${cook.id}" style="flex:1; text-align:center; padding:10px;">Save to History</button>
+          <button type="button" class="filter-chip track-canceldone-btn" data-id="${cook.id}" style="flex:none; text-align:center; padding:10px; opacity:.7;">Back</button>
+        </div>
+      </div>
+    `;
+  }
+
+  const elapsedHr = (now - cook.startTime) / 3600000;
+  const remainingHr = Math.max(0, est.high - elapsedHr);
   const pct = Math.min(100, (elapsedHr / est.high) * 100);
   const overdue = elapsedHr >= est.high;
-  const startDate = new Date(active.startTime);
-  const doneLow = new Date(active.startTime + est.low*3600000);
-  const doneHigh = new Date(active.startTime + est.high*3600000);
 
-  wrap.innerHTML = `
+  return `
     <div class="card">
       <div class="meat-head" style="margin-bottom:10px;">
         <div>
           <h3>${meat.name}</h3>
-          <span>${active.weight} lb · started ${fmtClockFromDate(startDate)}</span>
+          <span>${cook.weight} lb · started ${fmtClockFromDate(startDate)}</span>
         </div>
       </div>
+      <div class="result" style="margin-bottom:12px;">
+        <div class="rng">${overdue ? "PAST ESTIMATED WINDOW" : "TIME REMAINING"}</div>
+        <div class="big">${overdue ? "—" : fmtElapsedHours(remainingHr)}</div>
+        <div class="rng">${overdue ? "Check doneness, not the clock" : `Done by ${fmtClockFromDate(doneLow)}–${fmtClockFromDate(doneHigh)}`}</div>
+      </div>
       <div class="progress-track"><div class="progress-fill ${overdue ? "overdue" : ""}" style="width:${pct}%;"></div></div>
-      <div class="pairs" style="margin-bottom:4px;"><b>Elapsed:</b> ${fmtElapsedHours(elapsedHr)}</div>
-      <div class="pairs">${overdue ? "Past the estimated window — check doneness, not the clock." : `<b>Estimated done:</b> ${fmtClockFromDate(doneLow)}–${fmtClockFromDate(doneHigh)}`}</div>
+      <div class="pairs">${overdue ? "" : `<b>Elapsed:</b> ${fmtElapsedHours(elapsedHr)}`}</div>
       <div style="display:flex; gap:8px; margin-top:14px;">
-        <button type="button" class="filter-chip" id="trackDoneBtn" style="flex:1; text-align:center; padding:10px;">Mark Done</button>
-        <button type="button" class="filter-chip" id="trackCancelBtn" style="flex:none; text-align:center; padding:10px; opacity:.7;">Cancel</button>
+        <button type="button" class="filter-chip track-done-btn" data-id="${cook.id}" style="flex:1; text-align:center; padding:10px;">Mark Done</button>
+        <button type="button" class="filter-chip track-cancel-btn" data-id="${cook.id}" style="flex:none; text-align:center; padding:10px; opacity:.7;">Cancel</button>
       </div>
     </div>
   `;
-  document.getElementById('trackDoneBtn').addEventListener('click', () => {
-    const history = loadCookHistory();
-    history.unshift({
-      meatName: meat.name, weight: active.weight,
-      date: new Date().toLocaleDateString(),
-      hours: fmtElapsedHours(elapsedHr)
+}
+
+function renderTrackBody(){
+  const wrap = document.getElementById('trackBody');
+  const cooks = loadActiveCooks();
+
+  const startFormHtml = `
+    <div class="card">
+      <div class="calc-row">
+        <label for="trackMeat">Meat</label>
+        <select id="trackMeat"></select>
+      </div>
+      <div class="calc-row">
+        <label for="trackWeight">Weight (lb)</label>
+        <input type="number" id="trackWeight" min="0.5" step="0.5" value="10">
+      </div>
+      <div class="calc-row">
+        <label for="trackStart">Start time — leave as-is to start now, or push it forward to plan ahead</label>
+        <input type="datetime-local" id="trackStart">
+      </div>
+      <button type="button" class="filter-chip" id="trackStartBtn" style="width:100%; text-align:center; padding:12px; font-size:14px;">${cooks.length ? "Add Another Cook" : "Start This Cook"}</button>
+    </div>
+  `;
+
+  wrap.innerHTML = cooks.map(cookCardHtml).join("") + startFormHtml;
+
+  document.getElementById('trackMeat').innerHTML = MEATS.map(m => `<option value="${m.id}">${m.name}</option>`).join("");
+  document.getElementById('trackStart').value = localDatetimeValue(new Date());
+  document.getElementById('trackStartBtn').addEventListener('click', () => {
+    const meatId = document.getElementById('trackMeat').value;
+    const weight = parseFloat(document.getElementById('trackWeight').value) || 0;
+    const startVal = document.getElementById('trackStart').value;
+    const startTime = startVal ? new Date(startVal).getTime() : Date.now();
+    const list = loadActiveCooks();
+    list.push({
+      id: "cook-" + Date.now() + "-" + Math.floor(Math.random()*1000),
+      meatId, weight, startTime: isNaN(startTime) ? Date.now() : startTime
     });
-    saveCookHistory(history.slice(0,20));
-    saveActiveCook(null);
+    saveActiveCooks(list);
     renderTrackBody();
-    renderTrackHistory();
   });
-  document.getElementById('trackCancelBtn').addEventListener('click', () => {
-    saveActiveCook(null);
-    renderTrackBody();
+
+  wrap.querySelectorAll('.track-startnow-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const list = loadActiveCooks();
+      const item = list.find(c => c.id === btn.dataset.id);
+      if(item) item.startTime = Date.now();
+      saveActiveCooks(list);
+      renderTrackBody();
+    });
+  });
+  wrap.querySelectorAll('.track-cancel-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      saveActiveCooks(loadActiveCooks().filter(c => c.id !== btn.dataset.id));
+      renderTrackBody();
+    });
+  });
+  wrap.querySelectorAll('.track-done-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      finishingCooks.add(btn.dataset.id);
+      renderTrackBody();
+    });
+  });
+  wrap.querySelectorAll('.track-canceldone-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      finishingCooks.delete(btn.dataset.id);
+      delete finishRatings[btn.dataset.id];
+      renderTrackBody();
+    });
+  });
+  wrap.querySelectorAll('.finish-rate-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      finishRatings[btn.dataset.id] = parseInt(btn.dataset.n, 10);
+      renderTrackBody();
+    });
+  });
+  wrap.querySelectorAll('.track-savefinish-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const id = btn.dataset.id;
+      const list = loadActiveCooks();
+      const item = list.find(c => c.id === id);
+      if(item){
+        const meat = MEATS.find(m => m.id === item.meatId);
+        const elapsedHr = (Date.now() - item.startTime) / 3600000;
+        const notesEl = document.getElementById('doneNotes-' + id);
+        const notes = notesEl ? notesEl.value.trim() : "";
+        const rating = finishRatings[id] || 0;
+        const history = loadCookHistory();
+        history.unshift({
+          meatName: meat.name, weight: item.weight,
+          date: new Date().toLocaleDateString(),
+          hours: fmtElapsedHours(elapsedHr),
+          notes, rating
+        });
+        saveCookHistory(history.slice(0,20));
+      }
+      finishingCooks.delete(id);
+      delete finishRatings[id];
+      saveActiveCooks(list.filter(c => c.id !== id));
+      renderTrackBody();
+      renderTrackHistory();
+    });
   });
 }
 
+function escapeHtml(str){
+  return String(str)
+    .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;").replace(/'/g,"&#39;");
+}
 function renderTrackHistory(){
   const wrap = document.getElementById('trackHistory');
   const history = loadCookHistory();
@@ -1130,9 +1409,13 @@ function renderTrackHistory(){
     <div class="card">
       <h3 style="font-size:14px; margin-bottom:10px;">Recent Cooks</h3>
       ${history.map(h => `
-        <div class="history-row">
-          <span>${h.meatName} — ${h.weight} lb</span>
-          <span class="meta">${h.date} · ${h.hours}</span>
+        <div class="history-row" style="flex-direction:column; align-items:stretch; gap:4px;">
+          <div style="display:flex; justify-content:space-between; gap:10px;">
+            <span>${h.meatName} — ${h.weight} lb</span>
+            <span class="meta">${h.date} · ${h.hours}</span>
+          </div>
+          ${h.rating ? `<div class="rating">${dots(h.rating,"mustard")}</div>` : ""}
+          ${h.notes ? `<div class="pairs" style="font-size:12.5px;">${escapeHtml(h.notes)}</div>` : ""}
         </div>
       `).join("")}
       <button type="button" class="filter-chip" id="trackClearHistoryBtn" style="margin-top:12px; font-size:11px; padding:5px 10px; opacity:.6;">Clear history</button>
@@ -1145,18 +1428,22 @@ function renderTrackHistory(){
 }
 
 function initTracker(){
+  migrateActiveCook();
   renderTrackBody();
   renderTrackHistory();
-  setInterval(() => { if(loadActiveCook()) renderTrackBody(); }, 30000);
+  setInterval(() => { if(loadActiveCooks().length) renderTrackBody(); }, 30000);
 }
 
 renderMeats();
 renderSauces();
 initSauceFilters();
 renderWoods();
+renderFireZoneDiagram();
+renderZoneRef();
 initPrep();
 initTracker();
 initTabs();
 initCalc();
+initFeeds();
 initScore();
 </script>
