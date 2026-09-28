@@ -219,6 +219,26 @@ select:focus-visible, input:focus-visible{outline:2px solid var(--ember); outlin
 .result .rng{font-size:13px; color:var(--on-char-soft); margin-top:4px;}
 .result .sub{font-size:12px; color:var(--on-char-soft); margin-top:10px; border-top:1px solid rgba(255,255,255,.12); padding-top:10px;}
 
+/* Cook tracker */
+.progress-track{background:var(--surface-2); border-radius:20px; height:14px; overflow:hidden; margin:12px 0;}
+.progress-fill{height:100%; background:var(--ember); border-radius:20px; transition:width .4s ease;}
+.progress-fill.overdue{background:var(--hot);}
+.history-row{display:flex; justify-content:space-between; align-items:baseline; gap:10px; padding:9px 0; border-bottom:1px solid var(--line); font-size:13px;}
+.history-row:last-child{border-bottom:none;}
+.history-row .meta{color:var(--ink-soft); font-size:12px; white-space:nowrap;}
+
+/* Checklist */
+.checklist-group{margin-bottom:18px;}
+.checklist-group h3{font-size:12px; color:var(--ink-soft); letter-spacing:.05em; margin-bottom:8px;}
+.check-row{
+  display:flex; align-items:center; gap:10px;
+  padding:11px 12px; background:var(--surface); border:1px solid var(--line); border-radius:10px; margin-bottom:6px;
+}
+.check-row input[type=checkbox]{width:20px; height:20px; flex:none; accent-color:var(--ember);}
+.check-row label{font-size:14px; flex:1; line-height:1.4;}
+.check-row.checked{opacity:.55;}
+.check-row.checked label{text-decoration:line-through;}
+
 /* Fire zone diagram */
 .zone-wrap{background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:16px; margin-bottom:14px;}
 .zone-wrap svg{width:100%; height:auto; display:block;}
@@ -328,8 +348,11 @@ footer{text-align:center; font-size:11.5px; color:var(--ink-soft); padding:22px 
   <nav id="tabs">
     <button class="active" data-panel="meats">Meats &amp; Times</button>
     <button data-panel="calc">Calculator</button>
+    <button data-panel="track">My Cook</button>
     <button data-panel="fire">Fire Zones</button>
+    <button data-panel="wood">Wood</button>
     <button data-panel="sauce">Sauces</button>
+    <button data-panel="prep">Prep</button>
     <button data-panel="score">Scoring</button>
   </nav>
 </div>
@@ -403,6 +426,12 @@ footer{text-align:center; font-size:11.5px; color:var(--ink-soft); padding:22px 
   </div>
 </section>
 
+<section class="panel" id="panel-track">
+  <p class="lede">Start a live cook and track it in real time — the estimate keeps running even if you close the app and come back later.</p>
+  <div id="trackBody"></div>
+  <div id="trackHistory"></div>
+</section>
+
 <section class="panel" id="panel-fire">
   <p class="lede">Two zones, not one temperature. Where you set the meat down matters as much as what temp you're running.</p>
   <div class="zone-wrap">
@@ -439,6 +468,11 @@ footer{text-align:center; font-size:11.5px; color:var(--ink-soft); padding:22px 
   </div>
 </section>
 
+<section class="panel" id="panel-wood">
+  <p class="lede">The wood is half the flavor. Go light with strong ones and heavier with mild ones — you can always add more smoke, you can't take it away.</p>
+  <div id="woodCards"></div>
+</section>
+
 <section class="panel" id="panel-sauce">
   <p class="lede">A sauce for every state — from Texas mop to Hawaiian huli-huli. Match the sauce to the cut; one that fights the meat is worse than none at all.</p>
   <div class="calc-row" style="margin-bottom:12px;">
@@ -451,6 +485,12 @@ footer{text-align:center; font-size:11.5px; color:var(--ink-soft); padding:22px 
     <button type="button" class="filter-chip" data-filter="mild">Mild</button>
   </div>
   <div id="sauceCards"></div>
+</section>
+
+<section class="panel" id="panel-prep">
+  <p class="lede">Run through this before the fire's lit. Check things off as you go — it remembers, and resets clean for the next cook.</p>
+  <button type="button" class="filter-chip" id="prepResetBtn" style="margin-bottom:14px;">Reset Checklist</button>
+  <div id="prepList"></div>
 </section>
 
 <section class="panel" id="panel-score">
@@ -694,6 +734,48 @@ const SAUCES = [
     steps:["Combine everything in a saucepan over medium heat.","Simmer 12 minutes, stirring occasionally.","Go easy on the sage — it should be a background note, not the headline."]}
 ];
 
+const WOODS = [
+  {id:"hickory", name:"Hickory", intensity:5, tag:"Strong & bacon-y", desc:"The classic. Bold and savory with a little sweetness — can turn bitter if you oversmoke with it, especially on lighter meats.", best:"Pork butt, ribs, brisket"},
+  {id:"oak", name:"Oak", intensity:3, tag:"Medium & all-purpose", desc:"Steady, balanced smoke that doesn't fight the meat. The default choice for long Texas-style brisket cooks.", best:"Brisket, pork butt"},
+  {id:"mesquite", name:"Mesquite", intensity:5, tag:"Very strong & earthy", desc:"Burns hot and fast with an intense, almost tangy smoke. Easy to overdo — use it sparingly or blended with something milder.", best:"Brisket, sausage"},
+  {id:"pecan", name:"Pecan", intensity:2, tag:"Mild & nutty", desc:"A gentler cousin of hickory — nutty and a little sweet, without the risk of turning bitter over a long cook.", best:"Pork butt, chicken, ribs"},
+  {id:"apple", name:"Apple", intensity:1, tag:"Mild & sweet", desc:"Light, fruity smoke that won't overpower. A forgiving choice if you're still getting a feel for how much smoke is too much.", best:"Chicken, wings, sausage"},
+  {id:"cherry", name:"Cherry", intensity:2, tag:"Mild & fruity", desc:"Similar strength to apple but with a deeper color — gives the bark a reddish mahogany tint. Good blended with hickory or oak.", best:"Ribs, chicken, pork butt"},
+  {id:"maple", name:"Maple", intensity:1, tag:"Mild & subtly sweet", desc:"Light and mellow, barely there on its own. Works well blended with a stronger wood for a touch of background sweetness.", best:"Chicken, sausage"},
+  {id:"peach", name:"Peach", intensity:2, tag:"Mild & fruity", desc:"Close cousin to apple and cherry — soft, sweet smoke that plays nicely with fruit-based sauces.", best:"Chicken, ribs, wings"},
+  {id:"alder", name:"Alder", intensity:1, tag:"Very mild & delicate", desc:"Traditional Pacific Northwest wood for smoking salmon, but light enough not to overwhelm chicken either.", best:"Chicken, wings"},
+  {id:"walnut", name:"Walnut", intensity:5, tag:"Strong & bitter if alone", desc:"Sharp and heavy-handed by itself. Best cut with a milder wood like apple or pecan rather than used straight.", best:"Brisket (blended)"}
+];
+
+const PREP_GROUPS = [
+  {group:"Fuel & Fire", items:[
+    {id:"fuel-charcoal", label:"Charcoal or wood pellets stocked up"},
+    {id:"fuel-wood", label:"Wood chunks or chips ready (soaked, if you're using chips)"},
+    {id:"fuel-chimney", label:"Chimney starter and fire starters"},
+    {id:"fuel-extra", label:"Extra fuel on hand for a long cook"}
+  ]},
+  {group:"Tools", items:[
+    {id:"tool-therm", label:"Meat thermometer — probe and instant-read both charged and working"},
+    {id:"tool-tongs", label:"Tongs and insulated gloves"},
+    {id:"tool-spray", label:"Spray bottle for temp control or spritzing"},
+    {id:"tool-paper", label:"Butcher paper or foil for wrapping"},
+    {id:"tool-cooler", label:"Cooler for resting the meat when it's done"},
+    {id:"tool-knife", label:"Sharp knife and cutting board"}
+  ]},
+  {group:"Meat Prep", items:[
+    {id:"meat-trim", label:"Meat trimmed"},
+    {id:"meat-rub", label:"Rub or brine applied (night before, if you planned ahead)"},
+    {id:"meat-temp", label:"Meat resting at room temp before it goes on"},
+    {id:"meat-water", label:"Water pan filled"}
+  ]},
+  {group:"Serving", items:[
+    {id:"serve-sauce", label:"Sauces made or bottled and ready"},
+    {id:"serve-sides", label:"Sides prepped"},
+    {id:"serve-bread", label:"Buns, bread, or tortillas"},
+    {id:"serve-plates", label:"Plates, napkins, and a cooler for drinks"}
+  ]}
+];
+
 const ICONS_WRAP = (svg) => `<svg viewBox="0 0 24 24">${svg}</svg>`;
 
 function renderMeats(){
@@ -884,9 +966,196 @@ function initScore(){
   update();
 }
 
+function renderWoods(){
+  const wrap = document.getElementById('woodCards');
+  wrap.innerHTML = WOODS.map(w => `
+    <div class="card sauce-card">
+      <h3>${w.name}</h3>
+      <div class="sauce-tag">${w.tag}</div>
+      <p class="pairs" style="margin-top:8px;">${w.desc}</p>
+      <div class="stat" style="margin:10px 0; max-width:160px;">
+        <label>Intensity</label>
+        <div class="rating">${dots(w.intensity,"ember")}</div>
+      </div>
+      <p class="pairs"><b>Best with:</b> ${w.best}</p>
+    </div>
+  `).join("");
+}
+
+function loadPrepState(){
+  try{ return JSON.parse(localStorage.getItem('scarbq-prep')) || {}; }catch(e){ return {}; }
+}
+function savePrepState(state){
+  try{ localStorage.setItem('scarbq-prep', JSON.stringify(state)); }catch(e){}
+}
+function renderPrep(){
+  const state = loadPrepState();
+  const wrap = document.getElementById('prepList');
+  wrap.innerHTML = PREP_GROUPS.map(g => `
+    <div class="checklist-group">
+      <h3>${g.group.toUpperCase()}</h3>
+      ${g.items.map(it => `
+        <div class="check-row ${state[it.id] ? "checked" : ""}">
+          <input type="checkbox" id="chk-${it.id}" ${state[it.id] ? "checked" : ""}>
+          <label for="chk-${it.id}">${it.label}</label>
+        </div>
+      `).join("")}
+    </div>
+  `).join("");
+  wrap.querySelectorAll('input[type=checkbox]').forEach(cb => {
+    cb.addEventListener('change', () => {
+      const s = loadPrepState();
+      s[cb.id] = cb.checked;
+      savePrepState(s);
+      renderPrep();
+    });
+  });
+}
+function initPrep(){
+  renderPrep();
+  document.getElementById('prepResetBtn').addEventListener('click', () => {
+    savePrepState({});
+    renderPrep();
+  });
+}
+
+function loadActiveCook(){
+  try{ return JSON.parse(localStorage.getItem('scarbq-activecook')); }catch(e){ return null; }
+}
+function saveActiveCook(data){
+  try{
+    if(data) localStorage.setItem('scarbq-activecook', JSON.stringify(data));
+    else localStorage.removeItem('scarbq-activecook');
+  }catch(e){}
+}
+function loadCookHistory(){
+  try{ return JSON.parse(localStorage.getItem('scarbq-history')) || []; }catch(e){ return []; }
+}
+function saveCookHistory(list){
+  try{ localStorage.setItem('scarbq-history', JSON.stringify(list)); }catch(e){}
+}
+function estimateHours(meat, weight){
+  if(meat.timeMode === "perLb") return {low: meat.timeLow*weight, high: meat.timeHigh*weight};
+  return {low: meat.timeLow, high: meat.timeHigh};
+}
+function fmtClockFromDate(d){
+  let h = d.getHours(), m = d.getMinutes();
+  const ap = h >= 12 ? "PM" : "AM";
+  h = h % 12; if(h===0) h = 12;
+  return `${h}:${String(m).padStart(2,"0")} ${ap}`;
+}
+function fmtElapsedHours(hr){
+  const h = Math.floor(hr);
+  const m = Math.round((hr - h) * 60);
+  return `${h}h ${m}m`;
+}
+
+function renderTrackBody(){
+  const wrap = document.getElementById('trackBody');
+  const active = loadActiveCook();
+
+  if(!active){
+    wrap.innerHTML = `
+      <div class="card">
+        <div class="calc-row">
+          <label for="trackMeat">Meat</label>
+          <select id="trackMeat"></select>
+        </div>
+        <div class="calc-row">
+          <label for="trackWeight">Weight (lb)</label>
+          <input type="number" id="trackWeight" min="0.5" step="0.5" value="10">
+        </div>
+        <button type="button" class="filter-chip" id="trackStartBtn" style="width:100%; text-align:center; padding:12px; font-size:14px;">Start This Cook</button>
+      </div>
+    `;
+    document.getElementById('trackMeat').innerHTML = MEATS.map(m => `<option value="${m.id}">${m.name}</option>`).join("");
+    document.getElementById('trackStartBtn').addEventListener('click', () => {
+      const meatId = document.getElementById('trackMeat').value;
+      const weight = parseFloat(document.getElementById('trackWeight').value) || 0;
+      saveActiveCook({meatId, weight, startTime: Date.now()});
+      renderTrackBody();
+    });
+    return;
+  }
+
+  const meat = MEATS.find(m => m.id === active.meatId);
+  const est = estimateHours(meat, active.weight);
+  const elapsedHr = (Date.now() - active.startTime) / 3600000;
+  const pct = Math.min(100, (elapsedHr / est.high) * 100);
+  const overdue = elapsedHr >= est.high;
+  const startDate = new Date(active.startTime);
+  const doneLow = new Date(active.startTime + est.low*3600000);
+  const doneHigh = new Date(active.startTime + est.high*3600000);
+
+  wrap.innerHTML = `
+    <div class="card">
+      <div class="meat-head" style="margin-bottom:10px;">
+        <div>
+          <h3>${meat.name}</h3>
+          <span>${active.weight} lb · started ${fmtClockFromDate(startDate)}</span>
+        </div>
+      </div>
+      <div class="progress-track"><div class="progress-fill ${overdue ? "overdue" : ""}" style="width:${pct}%;"></div></div>
+      <div class="pairs" style="margin-bottom:4px;"><b>Elapsed:</b> ${fmtElapsedHours(elapsedHr)}</div>
+      <div class="pairs">${overdue ? "Past the estimated window — check doneness, not the clock." : `<b>Estimated done:</b> ${fmtClockFromDate(doneLow)}–${fmtClockFromDate(doneHigh)}`}</div>
+      <div style="display:flex; gap:8px; margin-top:14px;">
+        <button type="button" class="filter-chip" id="trackDoneBtn" style="flex:1; text-align:center; padding:10px;">Mark Done</button>
+        <button type="button" class="filter-chip" id="trackCancelBtn" style="flex:none; text-align:center; padding:10px; opacity:.7;">Cancel</button>
+      </div>
+    </div>
+  `;
+  document.getElementById('trackDoneBtn').addEventListener('click', () => {
+    const history = loadCookHistory();
+    history.unshift({
+      meatName: meat.name, weight: active.weight,
+      date: new Date().toLocaleDateString(),
+      hours: fmtElapsedHours(elapsedHr)
+    });
+    saveCookHistory(history.slice(0,20));
+    saveActiveCook(null);
+    renderTrackBody();
+    renderTrackHistory();
+  });
+  document.getElementById('trackCancelBtn').addEventListener('click', () => {
+    saveActiveCook(null);
+    renderTrackBody();
+  });
+}
+
+function renderTrackHistory(){
+  const wrap = document.getElementById('trackHistory');
+  const history = loadCookHistory();
+  if(!history.length){ wrap.innerHTML = ""; return; }
+  wrap.innerHTML = `
+    <div class="card">
+      <h3 style="font-size:14px; margin-bottom:10px;">Recent Cooks</h3>
+      ${history.map(h => `
+        <div class="history-row">
+          <span>${h.meatName} — ${h.weight} lb</span>
+          <span class="meta">${h.date} · ${h.hours}</span>
+        </div>
+      `).join("")}
+      <button type="button" class="filter-chip" id="trackClearHistoryBtn" style="margin-top:12px; font-size:11px; padding:5px 10px; opacity:.6;">Clear history</button>
+    </div>
+  `;
+  document.getElementById('trackClearHistoryBtn').addEventListener('click', () => {
+    saveCookHistory([]);
+    renderTrackHistory();
+  });
+}
+
+function initTracker(){
+  renderTrackBody();
+  renderTrackHistory();
+  setInterval(() => { if(loadActiveCook()) renderTrackBody(); }, 30000);
+}
+
 renderMeats();
 renderSauces();
 initSauceFilters();
+renderWoods();
+initPrep();
+initTracker();
 initTabs();
 initCalc();
 initScore();
