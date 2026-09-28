@@ -1,0 +1,589 @@
+<title>ScarBQ</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1a120c">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<style>
+:root{
+  --bg:#f6ead9;
+  --surface:#fffaf1;
+  --surface-2:#efe0c8;
+  --ink:#2a1810;
+  --ink-soft:#6b5647;
+  --ember:#d94f1e;
+  --ember-deep:#a83a12;
+  --mustard:#c98a1f;
+  --char:#2a1810;
+  --char-2:#241a12;
+  --on-char:#f1e4d3;
+  --on-char-soft:#c7b39c;
+  --line:#e0cbab;
+  --good:#4c7a3d;
+  --hot:#d94f1e;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#1a120c;
+    --surface:#241a12;
+    --surface-2:#2d2116;
+    --ink:#f1e4d3;
+    --ink-soft:#b8a48e;
+    --ember:#ff7a3d;
+    --ember-deep:#ff9863;
+    --mustard:#e3ab3f;
+    --char:#100b07;
+    --char-2:#0c0805;
+    --on-char:#f1e4d3;
+    --on-char-soft:#8f7a63;
+    --line:#3a2c1f;
+    --good:#7fae66;
+    --hot:#ff7a3d;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#1a120c;
+  --surface:#241a12;
+  --surface-2:#2d2116;
+  --ink:#f1e4d3;
+  --ink-soft:#b8a48e;
+  --ember:#ff7a3d;
+  --ember-deep:#ff9863;
+  --mustard:#e3ab3f;
+  --char:#100b07;
+  --char-2:#0c0805;
+  --on-char:#f1e4d3;
+  --on-char-soft:#8f7a63;
+  --line:#3a2c1f;
+  --good:#7fae66;
+  --hot:#ff7a3d;
+  color-scheme: dark;
+}
+
+*{box-sizing:border-box;}
+body{
+  background:var(--bg);
+  color:var(--ink);
+  font-family:'Inter',system-ui,-apple-system,sans-serif;
+  padding-inline:16px;
+  padding-block:0 24px;
+  max-width:880px;
+  margin:0 auto;
+}
+@media (max-width:370px){
+  .top h1{font-size:18px;}
+  nav button{font-size:12px; padding:7px 8px 9px;}
+  .calc-two{grid-template-columns:1fr;}
+  .stat-grid{grid-template-columns:repeat(auto-fit,minmax(100px,1fr));}
+}
+@media (min-width:700px){
+  #meatCards, #sauceCards{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(340px,1fr));
+    gap:12px;
+    align-items:start;
+  }
+  #meatCards .card, #sauceCards .card{margin-bottom:0;}
+}
+h1,h2,h3{font-family:'Oswald',system-ui,sans-serif; text-transform:uppercase; letter-spacing:.02em; text-wrap:balance; margin:0;}
+.mono{font-family:'JetBrains Mono',ui-monospace,monospace; font-variant-numeric: tabular-nums;}
+a{color:var(--ember);}
+
+/* Header */
+.top{
+  position:sticky;
+  top:env(safe-area-inset-top,0px);
+  z-index:20;
+  background:var(--char);
+  color:var(--on-char);
+  margin-inline:-16px;
+  padding:14px 16px 0;
+}
+.top-row{display:flex; align-items:center; gap:10px; padding-bottom:12px;}
+.flame{width:30px;height:30px;flex:none;}
+.top h1{font-size:20px; color:var(--on-char); line-height:1;}
+.top p{margin:2px 0 0; font-size:12px; color:var(--on-char-soft); letter-spacing:.03em;}
+
+nav{display:flex; gap:4px; overflow-x:auto; padding-bottom:10px; scrollbar-width:none;}
+nav::-webkit-scrollbar{display:none;}
+nav button{
+  flex:none;
+  font-family:'Oswald',sans-serif;
+  font-size:13px;
+  letter-spacing:.03em;
+  text-transform:uppercase;
+  background:transparent;
+  color:var(--on-char-soft);
+  border:none;
+  border-bottom:3px solid transparent;
+  padding:8px 10px 10px;
+  cursor:pointer;
+}
+nav button.active{color:var(--on-char); border-bottom-color:var(--ember);}
+nav button:focus-visible{outline:2px solid var(--ember); outline-offset:2px;}
+
+section.panel{display:none; padding-top:18px;}
+section.panel.active{display:block;}
+
+.lede{color:var(--ink-soft); font-size:14px; line-height:1.5; margin:2px 0 18px; max-width:56ch;}
+
+/* Cards */
+.card{
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:16px;
+  margin-bottom:12px;
+}
+.meat-card{display:flex; flex-direction:column; gap:10px;}
+.meat-head{display:flex; align-items:center; gap:12px;}
+.meat-icon{
+  width:44px;height:44px;flex:none;border-radius:10px;
+  background:var(--surface-2); display:flex; align-items:center; justify-content:center;
+}
+.meat-icon svg{width:24px;height:24px;stroke:var(--ember); fill:none; stroke-width:1.6;}
+.meat-head h3{font-size:17px;}
+.meat-head span{display:block; font-size:12px; color:var(--ink-soft); margin-top:1px;}
+
+.stat-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(120px,1fr));
+  gap:8px;
+}
+.stat{
+  background:var(--surface-2);
+  border-radius:10px;
+  padding:8px 10px;
+}
+.stat label{display:block; font-size:10px; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-soft); margin-bottom:2px;}
+.stat .v{font-size:15px; font-weight:600;}
+.stat .v.hot{color:var(--hot);}
+
+.tip{
+  display:flex; gap:8px; align-items:flex-start;
+  font-size:13.5px; line-height:1.5; color:var(--ink);
+  background:color-mix(in srgb, var(--ember) 10%, var(--surface));
+  border-left:3px solid var(--ember);
+  border-radius:6px;
+  padding:9px 11px;
+}
+.tip b{color:var(--ember-deep); font-weight:700;}
+.pairs{font-size:13px; color:var(--ink-soft);}
+.pairs b{color:var(--ink); font-weight:600;}
+
+/* Calculator */
+.calc-row{display:flex; flex-direction:column; gap:6px; margin-bottom:14px;}
+.calc-row label{font-size:12px; text-transform:uppercase; letter-spacing:.04em; color:var(--ink-soft);}
+select, input[type="number"], input[type="time"]{
+  font:inherit;
+  font-size:16px;
+  padding:11px 12px;
+  border-radius:10px;
+  border:1px solid var(--line);
+  background:var(--surface);
+  color:var(--ink);
+  width:100%;
+}
+select:focus-visible, input:focus-visible{outline:2px solid var(--ember); outline-offset:1px;}
+.calc-two{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
+.result{
+  background:var(--char);
+  color:var(--on-char);
+  border-radius:14px;
+  padding:18px;
+  text-align:center;
+}
+.result .big{font-family:'JetBrains Mono'; font-size:30px; font-weight:600; color:var(--ember);}
+.result .rng{font-size:13px; color:var(--on-char-soft); margin-top:4px;}
+.result .sub{font-size:12px; color:var(--on-char-soft); margin-top:10px; border-top:1px solid rgba(255,255,255,.12); padding-top:10px;}
+
+/* Fire zone diagram */
+.zone-wrap{background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:16px; margin-bottom:14px;}
+.zone-wrap svg{width:100%; height:auto; display:block;}
+.legend{display:flex; flex-wrap:wrap; gap:12px; margin-top:10px; font-size:12px; color:var(--ink-soft);}
+.legend span{display:inline-flex; align-items:center; gap:5px;}
+.dot{width:9px;height:9px;border-radius:50%; display:inline-block;}
+
+.rule-list{display:flex; flex-direction:column; gap:10px;}
+.rule{display:flex; gap:10px; align-items:flex-start;}
+.rule .n{
+  font-family:'JetBrains Mono'; font-weight:700; font-size:12px;
+  background:var(--ember); color:#fff8f0; width:22px; height:22px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center; flex:none; margin-top:1px;
+}
+.rule p{margin:0; font-size:14px; line-height:1.5;}
+.rule b{color:var(--ember-deep);}
+
+/* Sauce */
+.sauce-card{border-left:4px solid var(--mustard);}
+.sauce-card h3{font-size:16px; margin-bottom:2px;}
+.sauce-tag{
+  display:inline-block; font-size:10.5px; text-transform:uppercase; letter-spacing:.05em;
+  background:var(--surface-2); color:var(--ink-soft); padding:3px 8px; border-radius:20px; margin:6px 6px 0 0;
+}
+
+/* Scoring */
+.score-cat{margin-bottom:16px;}
+.score-cat .row1{display:flex; justify-content:space-between; align-items:baseline; margin-bottom:4px;}
+.score-cat h3{font-size:14px;}
+.score-cat .out{font-family:'JetBrains Mono'; font-weight:600; color:var(--ember);}
+input[type=range]{
+  -webkit-appearance:none; appearance:none;
+  width:100%; height:6px; border-radius:4px;
+  background:var(--surface-2);
+}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none; width:22px; height:22px; border-radius:50%;
+  background:var(--ember); border:3px solid var(--surface); cursor:pointer;
+  box-shadow:0 0 0 1px var(--line);
+}
+input[type=range]::-moz-range-thumb{
+  width:22px; height:22px; border-radius:50%; border:3px solid var(--surface);
+  background:var(--ember); cursor:pointer;
+}
+.score-total{
+  background:var(--char); color:var(--on-char); border-radius:14px; padding:16px; text-align:center; margin-top:6px;
+}
+.score-total .big{font-family:'JetBrains Mono'; font-size:34px; color:var(--ember); font-weight:700;}
+.score-total .label{font-size:12px; color:var(--on-char-soft); text-transform:uppercase; letter-spacing:.05em; margin-top:4px;}
+.kcbs{font-size:13px; line-height:1.6; color:var(--ink-soft);}
+.kcbs b{color:var(--ink);}
+
+footer{text-align:center; font-size:11.5px; color:var(--ink-soft); padding:22px 0 4px;}
+</style>
+
+<div class="top">
+  <div class="top-row">
+    <svg class="flame" viewBox="0 0 24 24" fill="none" stroke="var(--ember)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 22c4 0 6-2.5 6-6.2 0-2.4-1.3-4-2.4-5.6-.6-.9-1-2-.8-3.2-1.6.7-2.6 2.4-2.6 4.2 0-2.6-1.4-4.6-2.9-6-.3 1.8-.9 2.8-2 4.1C5.7 11 5 12.7 5 14.8 5 19 8 22 12 22Z"/>
+      <path d="M12 22c1.8 0 3-1.3 3-3.3 0-1.7-1.2-2.8-1.9-3.9-.4.9-1.1 1.5-1.1 2.6 0-1.3-.7-2.1-1.4-2.9-.6 1-.9 1.6-.9 2.6C9.7 19.5 10.4 22 12 22Z" fill="var(--ember)" stroke="none"/>
+    </svg>
+    <div>
+      <h1>ScarBQ</h1>
+      <p>Meat, fire &amp; sauce — the no-nonsense version</p>
+    </div>
+  </div>
+  <nav id="tabs">
+    <button class="active" data-panel="meats">Meats &amp; Times</button>
+    <button data-panel="calc">Calculator</button>
+    <button data-panel="fire">Fire Zones</button>
+    <button data-panel="sauce">Sauces</button>
+    <button data-panel="score">Scoring</button>
+  </nav>
+</div>
+
+<section class="panel active" id="panel-meats">
+  <p class="lede">Smoker temp, cook time, pull temp, and where to sit each cut relative to your heat source. Times are ranges — go by temp and feel, not the clock.</p>
+  <div id="meatCards"></div>
+</section>
+
+<section class="panel" id="panel-calc">
+  <p class="lede">Pick your meat and weight, tell it when you're starting (or when you need to eat), and it'll do the math.</p>
+  <div class="calc-row">
+    <label for="calcMeat">Meat</label>
+    <select id="calcMeat"></select>
+  </div>
+  <div class="calc-two">
+    <div class="calc-row">
+      <label for="calcWeight">Weight (lb)</label>
+      <input type="number" id="calcWeight" min="0.5" step="0.5" value="10">
+    </div>
+    <div class="calc-row">
+      <label for="calcMode">Work from</label>
+      <select id="calcMode">
+        <option value="start">Start time</option>
+        <option value="end">Serve time</option>
+      </select>
+    </div>
+  </div>
+  <div class="calc-row">
+    <label id="calcTimeLabel" for="calcTime">Start time</label>
+    <input type="time" id="calcTime">
+  </div>
+  <div class="result">
+    <div class="rng" id="resultTop">ESTIMATED COOK TIME</div>
+    <div class="big" id="resultRange">— </div>
+    <div class="rng" id="resultWindow"></div>
+    <div class="sub" id="resultSub"></div>
+  </div>
+</section>
+
+<section class="panel" id="panel-fire">
+  <p class="lede">Two zones, not one temperature. Where you set the meat down matters as much as what temp you're running.</p>
+  <div class="zone-wrap">
+    <svg viewBox="0 0 340 130" role="img" aria-label="Diagram of an offset smoker showing hot zone near the firebox and cool zone near the stack">
+      <rect x="0" y="30" width="340" height="70" rx="10" fill="var(--surface-2)"/>
+      <rect x="0" y="30" width="120" height="70" rx="10" fill="var(--ember)" opacity="0.22"/>
+      <rect x="220" y="30" width="120" height="70" rx="10" fill="var(--good)" opacity="0.18"/>
+      <circle cx="26" cy="65" r="15" fill="var(--ember)"/>
+      <path d="M26 50c4 5 7 8 7 12a7 7 0 1 1-14 0c0-4 3-7 7-12Z" fill="#fff8f0" opacity=".55"/>
+      <text x="26" y="112" text-anchor="middle" font-family="Oswald" font-size="10" fill="var(--ink-soft)">FIREBOX</text>
+      <rect x="70" y="52" width="36" height="18" rx="4" fill="var(--char)"/>
+      <text x="88" y="88" text-anchor="middle" font-family="Oswald" font-size="9" fill="var(--ink-soft)">BRISKET /</text>
+      <text x="88" y="98" text-anchor="middle" font-family="Oswald" font-size="9" fill="var(--ink-soft)">PORK BUTT</text>
+      <rect x="150" y="52" width="36" height="18" rx="4" fill="var(--char)" opacity=".85"/>
+      <text x="168" y="88" text-anchor="middle" font-family="Oswald" font-size="9" fill="var(--ink-soft)">RIBS</text>
+      <rect x="240" y="52" width="36" height="18" rx="4" fill="var(--char)" opacity=".7"/>
+      <text x="258" y="88" text-anchor="middle" font-family="Oswald" font-size="9" fill="var(--ink-soft)">CHICKEN /</text>
+      <text x="258" y="98" text-anchor="middle" font-family="Oswald" font-size="9" fill="var(--ink-soft)">SAUSAGE</text>
+      <rect x="316" y="20" width="14" height="55" rx="4" fill="var(--surface-2)" stroke="var(--line)"/>
+      <text x="323" y="112" text-anchor="middle" font-family="Oswald" font-size="9" fill="var(--ink-soft)">STACK</text>
+    </svg>
+    <div class="legend">
+      <span><span class="dot" style="background:var(--ember)"></span> Hot zone — closest to the fire</span>
+      <span><span class="dot" style="background:var(--good)"></span> Cool zone — near the stack</span>
+    </div>
+  </div>
+  <div class="card rule-list">
+    <div class="rule"><div class="n">1</div><p><b>Tough, fatty cuts sit closest to the fire.</b> Brisket and pork butt have hours of connective tissue to break down — they can take the heat, and the extra exposure helps them push through the stall.</p></div>
+    <div class="rule"><div class="n">2</div><p><b>Lean, quick cuts sit near the stack.</b> Chicken, sausage, and wings scorch and dry out fast. Keep them in the cool draw where the heat has already spread out and evened up.</p></div>
+    <div class="rule"><div class="n">3</div><p><b>Fat cap toward the fire.</b> On a brisket or butt, orient the fat cap so it faces the heat source — it renders down and bastes the meat instead of just dripping off, and it shields the muscle from scorching.</p></div>
+    <div class="rule"><div class="n">4</div><p><b>Rotate every 1–2 hours.</b> Every smoker runs hotter on the firebox side. Spin your cuts (and swap positions between them) so nothing sits in the hot spot the whole cook.</p></div>
+    <div class="rule"><div class="n">5</div><p><b>A water pan between fire and meat</b> buffers temperature spikes and keeps the cool zone from drying out — put it in the middle of the chamber, not right under any one cut.</p></div>
+    <div class="rule"><div class="n">6</div><p><b>Probe the thickest part, away from bone and fat.</b> Bone reads hotter, fat reads slower — either one will lie to you about doneness.</p></div>
+  </div>
+</section>
+
+<section class="panel" id="panel-sauce">
+  <p class="lede">Match the sauce to the cut. A sauce that fights the meat is worse than none at all.</p>
+  <div id="sauceCards"></div>
+</section>
+
+<section class="panel" id="panel-score">
+  <p class="lede">How competition judges actually score a plate — plus a version for grading your own backyard cook.</p>
+  <div class="card kcbs">
+    <b>Competition scoring, in short (KCBS-style):</b> each turn-in box gets three scores of 1–9 from every judge on the table — <b>Appearance</b>, <b>Taste</b>, and <b>Tenderness</b> — and taste usually counts double. A 9 means a judge would eat every bite in front of you; a 2 means something's actually wrong with it. Most solid boxes land in the 6–8 range — save 9s for the one that stops the table.
+  </div>
+  <div class="card">
+    <div class="score-cat">
+      <div class="row1"><h3>Appearance</h3><span class="out"><span id="vApp">7</span>/10</span></div>
+      <input type="range" id="sApp" min="1" max="10" value="7">
+      <p class="tip" style="margin-top:6px;">Color, glaze or bark, smoke ring, how clean the cut looks before anyone tastes it.</p>
+    </div>
+    <div class="score-cat">
+      <div class="row1"><h3>Taste</h3><span class="out"><span id="vTaste">7</span>/10</span></div>
+      <input type="range" id="sTaste" min="1" max="10" value="7">
+      <p class="tip" style="margin-top:6px;">Smoke, seasoning, and sauce (if any) working together — nothing should be shouting over the meat.</p>
+    </div>
+    <div class="score-cat">
+      <div class="row1"><h3>Tenderness</h3><span class="out"><span id="vTender">7</span>/10</span></div>
+      <input type="range" id="sTender" min="1" max="10" value="7">
+      <p class="tip" style="margin-top:6px;">Pulls or bites apart clean — not mushy, not fighting back.</p>
+    </div>
+    <div class="score-total">
+      <div class="big" id="scoreTotal">21<span style="font-size:16px;">/30</span></div>
+      <div class="label" id="scoreLabel">Solid plate</div>
+    </div>
+  </div>
+</section>
+
+<footer>Times and temps are starting points — altitude, wind, and your particular smoker will move them around.</footer>
+
+<script>
+const MEATS = [
+  {
+    id:"brisket", name:"Brisket", sub:"Whole packer",
+    icon:'<path d="M4 15c0-5 4-9 9-9s9 4 9 9-4 6-9 6-9-1-9-6Z"/><path d="M6 14c2-2 4-3 7-3"/>',
+    smoker:"225–250°F", weight:"10–14 lb", timeMode:"perLb", timeLow:1, timeHigh:1.5,
+    pull:"195–204°F", rest:"1–2 hr (cooler rest)",
+    tip:"Stalls hard around 150–170°F for hours — that's the collagen breaking down, not a problem. Wrap in butcher paper to push through if you're racing daylight.",
+    placement:"Fat cap toward the firebox, point end closest to the heat, flat end farther back.",
+    sauces:["texas","kc"]
+  },
+  {
+    id:"porkbutt", name:"Pork Butt", sub:"Bone-in shoulder, for pulling",
+    icon:'<circle cx="12" cy="12" r="8"/><path d="M9 9c1 1.5 1 4.5 0 6"/><path d="M15 9c-1 1.5-1 4.5 0 6"/>',
+    smoker:"225–250°F", weight:"8–10 lb", timeMode:"perLb", timeLow:1.5, timeHigh:2,
+    pull:"203–205°F", rest:"30–60 min",
+    tip:"Forgiving — it's hard to overcook this one before it turns to mush. If in doubt, give it more time, not less.",
+    placement:"Fat cap up, mid heat zone. It renders down over the whole cook and self-bastes.",
+    sauces:["carolina-vinegar","carolina-mustard","kc"]
+  },
+  {
+    id:"ribs", name:"Spare Ribs", sub:"St. Louis cut, per rack",
+    icon:'<path d="M4 6h16"/><path d="M4 10h16"/><path d="M4 14h16"/><path d="M4 18h16"/><path d="M6 4v16"/>',
+    smoker:"225–250°F", weight:"2.5–3.5 lb", timeMode:"flat", timeLow:5, timeHigh:6,
+    pull:"Bend test — probe slides like butter (~195–203°F)", rest:"10–15 min",
+    tip:"3-2-1 works well here: 3 hr smoking, 2 hr wrapped, 1 hr unwrapped to set the bark. Judge by bend, not just the thermometer.",
+    placement:"Bone side down toward the hot side for the first hour, then rotate meaty-side toward the heat.",
+    sauces:["kc","memphis"]
+  },
+  {
+    id:"chicken", name:"Whole Chicken", sub:"4–5 lb bird",
+    icon:'<path d="M12 3c-3 0-5 2.5-5 6 0 4 3 5 3 8 0 2-1.5 3-1.5 3h7s-1.5-1-1.5-3c0-3 3-4 3-8 0-3.5-2-6-5-6Z"/>',
+    smoker:"275–325°F (higher heat, crisp skin)", weight:"4–5 lb", timeMode:"perLb", timeLow:0.35, timeHigh:0.5,
+    pull:"165°F breast / 175°F thigh", rest:"15 min",
+    tip:"Runs hot and quick — the higher smoker temp keeps the skin from turning rubbery.",
+    placement:"Keep it in the cool zone near the stack, away from the direct hot point — it dries out fast if it sits too close.",
+    sauces:["alabama-white","kc"]
+  },
+  {
+    id:"sausage", name:"Sausage", sub:"Fresh links, per string",
+    icon:'<path d="M5 10a4 4 0 0 1 4-4h6a4 4 0 0 1 4 4v4a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4v-4Z"/><path d="M9 6v12"/><path d="M14 6v12"/>',
+    smoker:"225–250°F", weight:"~1 lb", timeMode:"flat", timeLow:2, timeHigh:3,
+    pull:"160°F", rest:"5 min",
+    tip:"Add it later in the cook — it doesn't need the hours the big cuts do, and it'll split if it sits over a hot spot too long.",
+    placement:"Cool zone, away from direct heat. Casings split fast when it's too close to the fire.",
+    sauces:["carolina-mustard","alabama-white"]
+  },
+  {
+    id:"wings", name:"Wings", sub:"2–3 lb batch",
+    icon:'<path d="M4 12c3-6 8-8 12-6 3 1.5 4 4 4 4s-3-1-5 0c3 1 4 3 4 3s-3-1-4.5 0c2 1 2.5 2 2.5 2-4 2-10-1-13-3Z"/>',
+    smoker:"275–300°F", weight:"2–3 lb", timeMode:"flat", timeLow:1, timeHigh:1.5,
+    pull:"175°F (past food-safe, for better texture)", rest:"5 min",
+    tip:"The higher temp is what gets the skin from rubbery to snappy — don't run these low and slow.",
+    placement:"Outer edge of the grate, rotate halfway for even crisping.",
+    sauces:["alabama-white","kc"]
+  }
+];
+
+const SAUCES = [
+  {id:"kc", name:"Kansas City", tag:"Sweet & tangy", desc:"Thick, tomato-and-molasses base with real sweetness and a mild tang. The crowd-pleaser — hard to go wrong with it.", pairs:"Ribs, pulled pork, chicken"},
+  {id:"texas", name:"Texas Mop", tag:"Thin & peppery", desc:"Thin, vinegar-and-pepper, sometimes not tomato-based at all. Built to baste, not to coat — lets the bark and smoke do the talking.", pairs:"Brisket"},
+  {id:"carolina-vinegar", name:"Carolina Vinegar", tag:"Sharp & thin", desc:"Just vinegar, pepper flake, and a little heat. No tomato. Cuts through fat instead of covering it up.", pairs:"Pulled pork"},
+  {id:"carolina-mustard", name:"Carolina Gold", tag:"Tangy mustard", desc:"Yellow mustard base with vinegar and a touch of sweetness. A different lane entirely from tomato sauces.", pairs:"Pulled pork, chicken, sausage"},
+  {id:"alabama-white", name:"Alabama White", tag:"Creamy & peppery", desc:"Mayo, vinegar, and cracked black pepper. Brushed on, not simmered in — built specifically for smoked chicken.", pairs:"Smoked chicken, wings"},
+  {id:"memphis", name:"Memphis Style", tag:"Sweet & tangy, on the side", desc:"Similar family to KC but thinner and usually served on the side so the dry rub stays the star.", pairs:"Ribs"}
+];
+
+const ICONS_WRAP = (svg) => `<svg viewBox="0 0 24 24">${svg}</svg>`;
+
+function renderMeats(){
+  const wrap = document.getElementById('meatCards');
+  wrap.innerHTML = MEATS.map(m => `
+    <div class="card meat-card">
+      <div class="meat-head">
+        <div class="meat-icon">${ICONS_WRAP(m.icon)}</div>
+        <div>
+          <h3>${m.name}</h3>
+          <span>${m.sub}</span>
+        </div>
+      </div>
+      <div class="stat-grid">
+        <div class="stat"><label>Smoker temp</label><div class="v hot mono">${m.smoker}</div></div>
+        <div class="stat"><label>Typical weight</label><div class="v mono">${m.weight}</div></div>
+        <div class="stat"><label>Cook time</label><div class="v mono">${timeLabel(m)}</div></div>
+        <div class="stat"><label>Pull temp</label><div class="v mono">${m.pull}</div></div>
+        <div class="stat"><label>Rest</label><div class="v mono">${m.rest}</div></div>
+      </div>
+      <div class="tip"><span>🔥</span><p style="margin:0"><b>Heads up —</b> ${m.tip}</p></div>
+      <div class="pairs"><b>Placement:</b> ${m.placement}</div>
+      <div class="pairs"><b>Pairs with:</b> ${m.sauces.map(id => SAUCES.find(s=>s.id===id).name).join(", ")}</div>
+    </div>
+  `).join("");
+}
+
+function timeLabel(m){
+  if(m.timeMode === "perLb") return `${m.timeLow}–${m.timeHigh} hr/lb`;
+  return `${m.timeLow}–${m.timeHigh} hr total`;
+}
+
+function renderSauces(){
+  const wrap = document.getElementById('sauceCards');
+  wrap.innerHTML = SAUCES.map(s => `
+    <div class="card sauce-card">
+      <h3>${s.name}</h3>
+      <div class="sauce-tag">${s.tag}</div>
+      <p class="pairs" style="margin-top:8px;">${s.desc}</p>
+      <p class="pairs"><b>Best with:</b> ${s.pairs}</p>
+    </div>
+  `).join("");
+}
+
+function populateCalc(){
+  const sel = document.getElementById('calcMeat');
+  sel.innerHTML = MEATS.map(m => `<option value="${m.id}">${m.name}</option>`).join("");
+}
+
+function fmtTime(mins){
+  const d = new Date();
+  d.setHours(0,0,0,0);
+  d.setMinutes(((mins % 1440) + 1440) % 1440);
+  let h = d.getHours(), m = d.getMinutes();
+  const ap = h >= 12 ? "PM" : "AM";
+  h = h % 12; if(h===0) h = 12;
+  return `${h}:${String(m).padStart(2,"0")} ${ap}`;
+}
+
+function runCalc(){
+  const meat = MEATS.find(m => m.id === document.getElementById('calcMeat').value);
+  const weight = parseFloat(document.getElementById('calcWeight').value) || 0;
+  const mode = document.getElementById('calcMode').value;
+  const timeVal = document.getElementById('calcTime').value;
+  let lowHr, highHr;
+  if(meat.timeMode === "perLb"){ lowHr = meat.timeLow * weight; highHr = meat.timeHigh * weight; }
+  else { lowHr = meat.timeLow; highHr = meat.timeHigh; }
+
+  document.getElementById('resultRange').textContent = `${lowHr.toFixed(1)}–${highHr.toFixed(1)} hr`;
+  document.getElementById('resultTop').textContent = "ESTIMATED COOK TIME";
+
+  if(!timeVal){
+    document.getElementById('resultWindow').textContent = "Set a time below to get a start/finish window";
+    document.getElementById('resultSub').textContent = "";
+    return;
+  }
+  const [hh,mm] = timeVal.split(":").map(Number);
+  const anchor = hh*60+mm;
+
+  if(mode === "start"){
+    const finishLow = anchor + lowHr*60;
+    const finishHigh = anchor + highHr*60;
+    document.getElementById('resultWindow').textContent = `Start at ${fmtTime(anchor)} → ready ${fmtTime(finishLow)}–${fmtTime(finishHigh)}`;
+  } else {
+    const startLow = anchor - highHr*60;
+    const startHigh = anchor - lowHr*60;
+    document.getElementById('resultWindow').textContent = `To eat at ${fmtTime(anchor)} → get it on between ${fmtTime(startLow)}–${fmtTime(startHigh)}`;
+  }
+  document.getElementById('resultSub').textContent = `Rest: ${meat.rest} · build that in on top of cook time`;
+}
+
+function initTabs(){
+  document.getElementById('tabs').addEventListener('click', (e) => {
+    const btn = e.target.closest('button[data-panel]');
+    if(!btn) return;
+    document.querySelectorAll('#tabs button').forEach(b => b.classList.toggle('active', b === btn));
+    document.querySelectorAll('section.panel').forEach(p => p.classList.toggle('active', p.id === `panel-${btn.dataset.panel}`));
+  });
+}
+
+function initCalc(){
+  populateCalc();
+  const now = new Date();
+  document.getElementById('calcTime').value = `${String(now.getHours()).padStart(2,"0")}:${String(now.getMinutes()).padStart(2,"0")}`;
+  ["calcMeat","calcWeight","calcTime"].forEach(id => document.getElementById(id).addEventListener('input', runCalc));
+  document.getElementById('calcMode').addEventListener('change', (e) => {
+    document.getElementById('calcTimeLabel').textContent = e.target.value === "start" ? "Start time" : "Serve time";
+    runCalc();
+  });
+  runCalc();
+}
+
+function initScore(){
+  const app = document.getElementById('sApp'), taste = document.getElementById('sTaste'), tender = document.getElementById('sTender');
+  const vApp = document.getElementById('vApp'), vTaste = document.getElementById('vTaste'), vTender = document.getElementById('vTender');
+  const total = document.getElementById('scoreTotal'), label = document.getElementById('scoreLabel');
+  function update(){
+    vApp.textContent = app.value; vTaste.textContent = taste.value; vTender.textContent = tender.value;
+    const t = Number(app.value) + Number(taste.value) + Number(tender.value);
+    total.innerHTML = `${t}<span style="font-size:16px;">/30</span>`;
+    label.textContent = t >= 27 ? "Table-stopper" : t >= 21 ? "Solid plate" : t >= 15 ? "Needs work" : "Back to the drawing board";
+    try{ localStorage.setItem('pitref-score', JSON.stringify({a:app.value,t:taste.value,d:tender.value})); }catch(e){}
+  }
+  [app,taste,tender].forEach(el => el.addEventListener('input', update));
+  try{
+    const saved = JSON.parse(localStorage.getItem('pitref-score'));
+    if(saved){ app.value = saved.a; taste.value = saved.t; tender.value = saved.d; }
+  }catch(e){}
+  update();
+}
+
+renderMeats();
+renderSauces();
+initTabs();
+initCalc();
+initScore();
+</script>

@@ -1,0 +1,17 @@
+{
+  "name": "ScarBQ",
+  "short_name": "ScarBQ",
+  "description": "Meat temps, cook times, fire-zone strategy, sauce pairings, and a scoring guide.",
+  "start_url": ".",
+  "scope": ".",
+  "id": "scarbq",
+  "display": "standalone",
+  "background_color": "#1a120c",
+  "theme_color": "#1a120c",
+  "orientation": "portrait",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
