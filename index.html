@@ -1,0 +1,893 @@
+<title>ScarBQ</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1a120c">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<style>
+:root{
+  --bg:#f6ead9;
+  --surface:#fffaf1;
+  --surface-2:#efe0c8;
+  --ink:#2a1810;
+  --ink-soft:#6b5647;
+  --ember:#d94f1e;
+  --ember-deep:#a83a12;
+  --mustard:#c98a1f;
+  --char:#2a1810;
+  --char-2:#241a12;
+  --on-char:#f1e4d3;
+  --on-char-soft:#c7b39c;
+  --line:#e0cbab;
+  --good:#4c7a3d;
+  --hot:#d94f1e;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#1a120c;
+    --surface:#241a12;
+    --surface-2:#2d2116;
+    --ink:#f1e4d3;
+    --ink-soft:#b8a48e;
+    --ember:#ff7a3d;
+    --ember-deep:#ff9863;
+    --mustard:#e3ab3f;
+    --char:#100b07;
+    --char-2:#0c0805;
+    --on-char:#f1e4d3;
+    --on-char-soft:#8f7a63;
+    --line:#3a2c1f;
+    --good:#7fae66;
+    --hot:#ff7a3d;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#1a120c;
+  --surface:#241a12;
+  --surface-2:#2d2116;
+  --ink:#f1e4d3;
+  --ink-soft:#b8a48e;
+  --ember:#ff7a3d;
+  --ember-deep:#ff9863;
+  --mustard:#e3ab3f;
+  --char:#100b07;
+  --char-2:#0c0805;
+  --on-char:#f1e4d3;
+  --on-char-soft:#8f7a63;
+  --line:#3a2c1f;
+  --good:#7fae66;
+  --hot:#ff7a3d;
+  color-scheme: dark;
+}
+
+*{box-sizing:border-box;}
+body{
+  background-color:var(--bg);
+  background-image:
+    radial-gradient(50% 28% at 15% 100%, color-mix(in srgb, var(--ember) 16%, transparent) 0%, transparent 75%),
+    radial-gradient(45% 24% at 85% 100%, color-mix(in srgb, var(--mustard) 13%, transparent) 0%, transparent 75%);
+  background-repeat:no-repeat, no-repeat;
+  background-attachment:fixed, fixed;
+  color:var(--ink);
+  font-family:'Inter',system-ui,-apple-system,sans-serif;
+  padding-inline:16px;
+  padding-block:0 24px;
+  max-width:880px;
+  margin:0 auto;
+  min-height:100vh;
+}
+@media (max-width:370px){
+  .top h1{font-size:18px;}
+  nav button{font-size:12px; padding:7px 8px 9px;}
+  .calc-two{grid-template-columns:1fr;}
+  .stat-grid{grid-template-columns:repeat(auto-fit,minmax(100px,1fr));}
+}
+@media (min-width:700px){
+  #meatCards, #sauceCards{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(340px,1fr));
+    gap:12px;
+    align-items:start;
+  }
+  #meatCards .card, #sauceCards .card{margin-bottom:0;}
+}
+h1,h2,h3{font-family:'Oswald',system-ui,sans-serif; text-transform:uppercase; letter-spacing:.02em; text-wrap:balance; margin:0;}
+.mono{font-family:'JetBrains Mono',ui-monospace,monospace; font-variant-numeric: tabular-nums;}
+a{color:var(--ember);}
+
+/* Header */
+.top{
+  position:sticky;
+  top:env(safe-area-inset-top,0px);
+  z-index:20;
+  background:var(--char);
+  color:var(--on-char);
+  margin-inline:-16px;
+  padding:14px 16px 0;
+}
+.top-row{display:flex; align-items:center; gap:10px; padding-bottom:12px;}
+
+.grate-hero{
+  margin-inline:-16px;
+  background:var(--char);
+  overflow:hidden;
+  line-height:0;
+  border-bottom:1px solid color-mix(in srgb, var(--ember) 30%, var(--char));
+}
+.grate-hero svg{width:100%; height:auto; display:block;}
+@keyframes emberPulse{ 0%,100%{opacity:.8;} 50%{opacity:1;} }
+.coal-glow{animation:emberPulse 3.5s ease-in-out infinite;}
+@media (prefers-reduced-motion:reduce){ .coal-glow{animation:none;} }
+.flame{width:30px;height:30px;flex:none;}
+.top h1{font-size:20px; color:var(--on-char); line-height:1;}
+.top p{margin:2px 0 0; font-size:12px; color:var(--on-char-soft); letter-spacing:.03em;}
+
+nav{display:flex; gap:4px; overflow-x:auto; padding-bottom:10px; scrollbar-width:none;}
+nav::-webkit-scrollbar{display:none;}
+nav button{
+  flex:none;
+  font-family:'Oswald',sans-serif;
+  font-size:13px;
+  letter-spacing:.03em;
+  text-transform:uppercase;
+  background:transparent;
+  color:var(--on-char-soft);
+  border:none;
+  border-bottom:3px solid transparent;
+  padding:8px 10px 10px;
+  cursor:pointer;
+}
+nav button.active{color:var(--on-char); border-bottom-color:var(--ember);}
+nav button:focus-visible{outline:2px solid var(--ember); outline-offset:2px;}
+
+section.panel{display:none; padding-top:18px;}
+section.panel.active{display:block;}
+
+.lede{color:var(--ink-soft); font-size:14px; line-height:1.5; margin:2px 0 18px; max-width:56ch;}
+
+/* Cards */
+.card{
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:16px;
+  margin-bottom:12px;
+}
+.meat-card{display:flex; flex-direction:column; gap:10px;}
+.meat-head{display:flex; align-items:center; gap:12px;}
+.meat-icon{
+  width:44px;height:44px;flex:none;border-radius:10px;
+  background:var(--surface-2); display:flex; align-items:center; justify-content:center;
+}
+.meat-icon svg{width:24px;height:24px;stroke:var(--ember); fill:none; stroke-width:1.6;}
+.meat-head h3{font-size:17px;}
+.meat-head span{display:block; font-size:12px; color:var(--ink-soft); margin-top:1px;}
+
+.stat-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(120px,1fr));
+  gap:8px;
+}
+.stat{
+  background:var(--surface-2);
+  border-radius:10px;
+  padding:8px 10px;
+}
+.stat label{display:block; font-size:10px; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-soft); margin-bottom:2px;}
+.stat .v{font-size:15px; font-weight:600;}
+.stat .v.hot{color:var(--hot);}
+
+.tip{
+  display:flex; gap:8px; align-items:flex-start;
+  font-size:13.5px; line-height:1.5; color:var(--ink);
+  background:color-mix(in srgb, var(--ember) 10%, var(--surface));
+  border-left:3px solid var(--ember);
+  border-radius:6px;
+  padding:9px 11px;
+}
+.tip b{color:var(--ember-deep); font-weight:700;}
+.pairs{font-size:13px; color:var(--ink-soft);}
+.pairs b{color:var(--ink); font-weight:600;}
+
+/* Calculator */
+.calc-row{display:flex; flex-direction:column; gap:6px; margin-bottom:14px;}
+.calc-row label{font-size:12px; text-transform:uppercase; letter-spacing:.04em; color:var(--ink-soft);}
+select, input[type="number"], input[type="time"], input[type="text"]{
+  font:inherit;
+  font-size:16px;
+  padding:11px 12px;
+  border-radius:10px;
+  border:1px solid var(--line);
+  background:var(--surface);
+  color:var(--ink);
+  width:100%;
+}
+select:focus-visible, input:focus-visible{outline:2px solid var(--ember); outline-offset:1px;}
+.calc-two{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
+.result{
+  background:var(--char);
+  color:var(--on-char);
+  border-radius:14px;
+  padding:18px;
+  text-align:center;
+}
+.result .big{font-family:'JetBrains Mono'; font-size:30px; font-weight:600; color:var(--ember);}
+.result .rng{font-size:13px; color:var(--on-char-soft); margin-top:4px;}
+.result .sub{font-size:12px; color:var(--on-char-soft); margin-top:10px; border-top:1px solid rgba(255,255,255,.12); padding-top:10px;}
+
+/* Fire zone diagram */
+.zone-wrap{background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:16px; margin-bottom:14px;}
+.zone-wrap svg{width:100%; height:auto; display:block;}
+.legend{display:flex; flex-wrap:wrap; gap:12px; margin-top:10px; font-size:12px; color:var(--ink-soft);}
+.legend span{display:inline-flex; align-items:center; gap:5px;}
+.dot{width:9px;height:9px;border-radius:50%; display:inline-block;}
+
+.rule-list{display:flex; flex-direction:column; gap:10px;}
+.rule{display:flex; gap:10px; align-items:flex-start;}
+.rule .n{
+  font-family:'JetBrains Mono'; font-weight:700; font-size:12px;
+  background:var(--ember); color:#fff8f0; width:22px; height:22px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center; flex:none; margin-top:1px;
+}
+.rule p{margin:0; font-size:14px; line-height:1.5;}
+.rule b{color:var(--ember-deep);}
+
+/* Sauce */
+.sauce-card{border-left:4px solid var(--mustard);}
+.sauce-card h3{font-size:16px; margin-bottom:2px;}
+.sauce-tag{
+  display:inline-block; font-size:10.5px; text-transform:uppercase; letter-spacing:.05em;
+  background:var(--surface-2); color:var(--ink-soft); padding:3px 8px; border-radius:20px; margin:6px 6px 0 0;
+}
+.sauce-head{display:flex; justify-content:space-between; align-items:flex-start; gap:10px;}
+.sauce-head span{display:block; font-size:12px; color:var(--ink-soft); margin-top:1px;}
+.state-badge{
+  font-family:'JetBrains Mono',ui-monospace,monospace; font-size:11px; font-weight:700; letter-spacing:.04em;
+  background:var(--char); color:var(--on-char); padding:3px 7px; border-radius:6px; flex:none; white-space:nowrap;
+}
+.rating{display:flex; gap:3px; align-items:center;}
+.pip{width:8px; height:8px; border-radius:50%; background:var(--line); flex:none;}
+.pip.on.ember{background:var(--ember);}
+.pip.on.mustard{background:var(--mustard);}
+.chip-row{display:flex; gap:8px; flex-wrap:wrap; margin:-4px 0 14px;}
+.filter-chip{
+  font-family:'Oswald',sans-serif; font-size:12.5px; letter-spacing:.03em; text-transform:uppercase;
+  background:var(--surface-2); color:var(--ink-soft); border:1px solid var(--line);
+  padding:7px 12px; border-radius:20px; cursor:pointer;
+}
+.filter-chip.active{background:var(--ember); border-color:var(--ember); color:#fff8f0;}
+
+.recipe{margin-top:10px; border-top:1px solid var(--line); padding-top:8px;}
+.recipe summary{
+  cursor:pointer;
+  list-style:none;
+  display:inline-flex; align-items:center; gap:7px;
+  font-family:'Oswald',sans-serif; font-size:12.5px; letter-spacing:.03em; text-transform:uppercase;
+  color:var(--ember-deep); font-weight:600;
+  padding:4px 0;
+}
+.recipe summary::-webkit-details-marker{display:none;}
+.recipe summary::before{
+  content:"+";
+  display:inline-flex; align-items:center; justify-content:center;
+  width:17px; height:17px; border-radius:50%; flex:none;
+  background:var(--ember); color:#fff8f0; font-size:12px; font-weight:700; line-height:1;
+}
+.recipe[open] summary::before{content:"–";}
+.recipe[open] summary{margin-bottom:6px;}
+.recipe-body{font-size:13px; line-height:1.55; color:var(--ink);}
+.recipe-yield{color:var(--ink-soft); font-size:12px; margin:0 0 8px;}
+.recipe-body h4{font-family:'Oswald',sans-serif; font-size:11px; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-soft); margin:10px 0 4px;}
+.recipe-body ul, .recipe-body ol{margin:0; padding-left:18px; display:flex; flex-direction:column; gap:4px;}
+
+/* Scoring */
+.score-cat{margin-bottom:16px;}
+.score-cat .row1{display:flex; justify-content:space-between; align-items:baseline; margin-bottom:4px;}
+.score-cat h3{font-size:14px;}
+.score-cat .out{font-family:'JetBrains Mono'; font-weight:600; color:var(--ember);}
+input[type=range]{
+  -webkit-appearance:none; appearance:none;
+  width:100%; height:6px; border-radius:4px;
+  background:var(--surface-2);
+}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none; width:22px; height:22px; border-radius:50%;
+  background:var(--ember); border:3px solid var(--surface); cursor:pointer;
+  box-shadow:0 0 0 1px var(--line);
+}
+input[type=range]::-moz-range-thumb{
+  width:22px; height:22px; border-radius:50%; border:3px solid var(--surface);
+  background:var(--ember); cursor:pointer;
+}
+.score-total{
+  background:var(--char); color:var(--on-char); border-radius:14px; padding:16px; text-align:center; margin-top:6px;
+}
+.score-total .big{font-family:'JetBrains Mono'; font-size:34px; color:var(--ember); font-weight:700;}
+.score-total .label{font-size:12px; color:var(--on-char-soft); text-transform:uppercase; letter-spacing:.05em; margin-top:4px;}
+.kcbs{font-size:13px; line-height:1.6; color:var(--ink-soft);}
+.kcbs b{color:var(--ink);}
+
+footer{text-align:center; font-size:11.5px; color:var(--ink-soft); padding:22px 0 4px;}
+</style>
+
+<div class="top">
+  <div class="top-row">
+    <svg class="flame" viewBox="0 0 24 24" fill="none" stroke="var(--ember)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 22c4 0 6-2.5 6-6.2 0-2.4-1.3-4-2.4-5.6-.6-.9-1-2-.8-3.2-1.6.7-2.6 2.4-2.6 4.2 0-2.6-1.4-4.6-2.9-6-.3 1.8-.9 2.8-2 4.1C5.7 11 5 12.7 5 14.8 5 19 8 22 12 22Z"/>
+      <path d="M12 22c1.8 0 3-1.3 3-3.3 0-1.7-1.2-2.8-1.9-3.9-.4.9-1.1 1.5-1.1 2.6 0-1.3-.7-2.1-1.4-2.9-.6 1-.9 1.6-.9 2.6C9.7 19.5 10.4 22 12 22Z" fill="var(--ember)" stroke="none"/>
+    </svg>
+    <div>
+      <h1>ScarBQ</h1>
+      <p>Meat, fire &amp; sauce — the no-nonsense version</p>
+    </div>
+  </div>
+  <nav id="tabs">
+    <button class="active" data-panel="meats">Meats &amp; Times</button>
+    <button data-panel="calc">Calculator</button>
+    <button data-panel="fire">Fire Zones</button>
+    <button data-panel="sauce">Sauces</button>
+    <button data-panel="score">Scoring</button>
+  </nav>
+</div>
+
+<div class="grate-hero" aria-hidden="true">
+  <svg viewBox="0 0 400 90" preserveAspectRatio="none">
+    <defs>
+      <filter id="coalBlur" x="-30%" y="-60%" width="160%" height="220%">
+        <feGaussianBlur stdDeviation="7"/>
+      </filter>
+      <linearGradient id="barGrad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="var(--char-2)"/>
+        <stop offset="55%" stop-color="var(--char)"/>
+        <stop offset="100%" stop-color="var(--char-2)"/>
+      </linearGradient>
+    </defs>
+    <rect x="0" y="0" width="400" height="90" fill="var(--char)"/>
+    <g class="coal-glow" filter="url(#coalBlur)">
+      <ellipse cx="40" cy="96" rx="55" ry="20" fill="var(--ember)" opacity="0.6"/>
+      <ellipse cx="140" cy="100" rx="65" ry="22" fill="var(--mustard)" opacity="0.45"/>
+      <ellipse cx="230" cy="94" rx="60" ry="20" fill="var(--ember-deep)" opacity="0.55"/>
+      <ellipse cx="320" cy="99" rx="70" ry="23" fill="var(--ember)" opacity="0.55"/>
+      <ellipse cx="390" cy="95" rx="50" ry="18" fill="var(--mustard)" opacity="0.4"/>
+    </g>
+    <g>
+      <rect x="-10" y="12" width="420" height="12" rx="6" fill="url(#barGrad)"/>
+      <rect x="-10" y="13" width="420" height="2.5" rx="1.2" fill="var(--on-char-soft)" opacity="0.3"/>
+      <rect x="-10" y="32" width="420" height="12" rx="6" fill="url(#barGrad)"/>
+      <rect x="-10" y="33" width="420" height="2.5" rx="1.2" fill="var(--on-char-soft)" opacity="0.3"/>
+      <rect x="-10" y="52" width="420" height="12" rx="6" fill="url(#barGrad)"/>
+      <rect x="-10" y="53" width="420" height="2.5" rx="1.2" fill="var(--on-char-soft)" opacity="0.3"/>
+      <rect x="-10" y="72" width="420" height="12" rx="6" fill="url(#barGrad)"/>
+      <rect x="-10" y="73" width="420" height="2.5" rx="1.2" fill="var(--on-char-soft)" opacity="0.3"/>
+    </g>
+  </svg>
+</div>
+
+<section class="panel active" id="panel-meats">
+  <p class="lede">Smoker temp, cook time, pull temp, and where to sit each cut relative to your heat source. Times are ranges — go by temp and feel, not the clock.</p>
+  <div id="meatCards"></div>
+</section>
+
+<section class="panel" id="panel-calc">
+  <p class="lede">Pick your meat and weight, tell it when you're starting (or when you need to eat), and it'll do the math.</p>
+  <div class="calc-row">
+    <label for="calcMeat">Meat</label>
+    <select id="calcMeat"></select>
+  </div>
+  <div class="calc-two">
+    <div class="calc-row">
+      <label for="calcWeight">Weight (lb)</label>
+      <input type="number" id="calcWeight" min="0.5" step="0.5" value="10">
+    </div>
+    <div class="calc-row">
+      <label for="calcMode">Work from</label>
+      <select id="calcMode">
+        <option value="start">Start time</option>
+        <option value="end">Serve time</option>
+      </select>
+    </div>
+  </div>
+  <div class="calc-row">
+    <label id="calcTimeLabel" for="calcTime">Start time</label>
+    <input type="time" id="calcTime">
+  </div>
+  <div class="result">
+    <div class="rng" id="resultTop">ESTIMATED COOK TIME</div>
+    <div class="big" id="resultRange">— </div>
+    <div class="rng" id="resultWindow"></div>
+    <div class="sub" id="resultSub"></div>
+  </div>
+</section>
+
+<section class="panel" id="panel-fire">
+  <p class="lede">Two zones, not one temperature. Where you set the meat down matters as much as what temp you're running.</p>
+  <div class="zone-wrap">
+    <svg viewBox="0 0 340 130" role="img" aria-label="Diagram of an offset smoker showing hot zone near the firebox and cool zone near the stack">
+      <rect x="0" y="30" width="340" height="70" rx="10" fill="var(--surface-2)"/>
+      <rect x="0" y="30" width="120" height="70" rx="10" fill="var(--ember)" opacity="0.22"/>
+      <rect x="220" y="30" width="120" height="70" rx="10" fill="var(--good)" opacity="0.18"/>
+      <circle cx="26" cy="65" r="15" fill="var(--ember)"/>
+      <path d="M26 50c4 5 7 8 7 12a7 7 0 1 1-14 0c0-4 3-7 7-12Z" fill="#fff8f0" opacity=".55"/>
+      <text x="26" y="112" text-anchor="middle" font-family="Oswald" font-size="10" fill="var(--ink-soft)">FIREBOX</text>
+      <rect x="70" y="52" width="36" height="18" rx="4" fill="var(--char)"/>
+      <text x="88" y="88" text-anchor="middle" font-family="Oswald" font-size="9" fill="var(--ink-soft)">BRISKET /</text>
+      <text x="88" y="98" text-anchor="middle" font-family="Oswald" font-size="9" fill="var(--ink-soft)">PORK BUTT</text>
+      <rect x="150" y="52" width="36" height="18" rx="4" fill="var(--char)" opacity=".85"/>
+      <text x="168" y="88" text-anchor="middle" font-family="Oswald" font-size="9" fill="var(--ink-soft)">RIBS</text>
+      <rect x="240" y="52" width="36" height="18" rx="4" fill="var(--char)" opacity=".7"/>
+      <text x="258" y="88" text-anchor="middle" font-family="Oswald" font-size="9" fill="var(--ink-soft)">CHICKEN /</text>
+      <text x="258" y="98" text-anchor="middle" font-family="Oswald" font-size="9" fill="var(--ink-soft)">SAUSAGE</text>
+      <rect x="316" y="20" width="14" height="55" rx="4" fill="var(--surface-2)" stroke="var(--line)"/>
+      <text x="323" y="112" text-anchor="middle" font-family="Oswald" font-size="9" fill="var(--ink-soft)">STACK</text>
+    </svg>
+    <div class="legend">
+      <span><span class="dot" style="background:var(--ember)"></span> Hot zone — closest to the fire</span>
+      <span><span class="dot" style="background:var(--good)"></span> Cool zone — near the stack</span>
+    </div>
+  </div>
+  <div class="card rule-list">
+    <div class="rule"><div class="n">1</div><p><b>Tough, fatty cuts sit closest to the fire.</b> Brisket and pork butt have hours of connective tissue to break down — they can take the heat, and the extra exposure helps them push through the stall.</p></div>
+    <div class="rule"><div class="n">2</div><p><b>Lean, quick cuts sit near the stack.</b> Chicken, sausage, and wings scorch and dry out fast. Keep them in the cool draw where the heat has already spread out and evened up.</p></div>
+    <div class="rule"><div class="n">3</div><p><b>Fat cap toward the fire.</b> On a brisket or butt, orient the fat cap so it faces the heat source — it renders down and bastes the meat instead of just dripping off, and it shields the muscle from scorching.</p></div>
+    <div class="rule"><div class="n">4</div><p><b>Rotate every 1–2 hours.</b> Every smoker runs hotter on the firebox side. Spin your cuts (and swap positions between them) so nothing sits in the hot spot the whole cook.</p></div>
+    <div class="rule"><div class="n">5</div><p><b>A water pan between fire and meat</b> buffers temperature spikes and keeps the cool zone from drying out — put it in the middle of the chamber, not right under any one cut.</p></div>
+    <div class="rule"><div class="n">6</div><p><b>Probe the thickest part, away from bone and fat.</b> Bone reads hotter, fat reads slower — either one will lie to you about doneness.</p></div>
+  </div>
+</section>
+
+<section class="panel" id="panel-sauce">
+  <p class="lede">A sauce for every state — from Texas mop to Hawaiian huli-huli. Match the sauce to the cut; one that fights the meat is worse than none at all.</p>
+  <div class="calc-row" style="margin-bottom:12px;">
+    <label for="sauceSearch">Find a state or sauce</label>
+    <input type="text" id="sauceSearch" placeholder="Try “Texas,” “bourbon,” or a state name…" autocomplete="off">
+  </div>
+  <div class="chip-row">
+    <button type="button" class="filter-chip" data-filter="spicy">🌶 Spicy</button>
+    <button type="button" class="filter-chip" data-filter="sweet">🍯 Sweet</button>
+    <button type="button" class="filter-chip" data-filter="mild">Mild</button>
+  </div>
+  <div id="sauceCards"></div>
+</section>
+
+<section class="panel" id="panel-score">
+  <p class="lede">How competition judges actually score a plate — plus a version for grading your own backyard cook.</p>
+  <div class="card kcbs">
+    <b>Competition scoring, in short (KCBS-style):</b> each turn-in box gets three scores of 1–9 from every judge on the table — <b>Appearance</b>, <b>Taste</b>, and <b>Tenderness</b> — and taste usually counts double. A 9 means a judge would eat every bite in front of you; a 2 means something's actually wrong with it. Most solid boxes land in the 6–8 range — save 9s for the one that stops the table.
+  </div>
+  <div class="card">
+    <div class="score-cat">
+      <div class="row1"><h3>Appearance</h3><span class="out"><span id="vApp">7</span>/10</span></div>
+      <input type="range" id="sApp" min="1" max="10" value="7">
+      <p class="tip" style="margin-top:6px;">Color, glaze or bark, smoke ring, how clean the cut looks before anyone tastes it.</p>
+    </div>
+    <div class="score-cat">
+      <div class="row1"><h3>Taste</h3><span class="out"><span id="vTaste">7</span>/10</span></div>
+      <input type="range" id="sTaste" min="1" max="10" value="7">
+      <p class="tip" style="margin-top:6px;">Smoke, seasoning, and sauce (if any) working together — nothing should be shouting over the meat.</p>
+    </div>
+    <div class="score-cat">
+      <div class="row1"><h3>Tenderness</h3><span class="out"><span id="vTender">7</span>/10</span></div>
+      <input type="range" id="sTender" min="1" max="10" value="7">
+      <p class="tip" style="margin-top:6px;">Pulls or bites apart clean — not mushy, not fighting back.</p>
+    </div>
+    <div class="score-total">
+      <div class="big" id="scoreTotal">21<span style="font-size:16px;">/30</span></div>
+      <div class="label" id="scoreLabel">Solid plate</div>
+    </div>
+  </div>
+</section>
+
+<footer>Times and temps are starting points — altitude, wind, and your particular smoker will move them around.</footer>
+
+<script>
+const MEATS = [
+  {
+    id:"brisket", name:"Brisket", sub:"Whole packer",
+    icon:'<path d="M4 15c0-5 4-9 9-9s9 4 9 9-4 6-9 6-9-1-9-6Z"/><path d="M6 14c2-2 4-3 7-3"/>',
+    smoker:"225–250°F", weight:"10–14 lb", timeMode:"perLb", timeLow:1, timeHigh:1.5,
+    pull:"195–204°F", rest:"1–2 hr (cooler rest)",
+    tip:"Stalls hard around 150–170°F for hours — that's the collagen breaking down, not a problem. Wrap in butcher paper to push through if you're racing daylight.",
+    placement:"Fat cap toward the firebox, point end closest to the heat, flat end farther back.",
+    sauces:["texas","kc"]
+  },
+  {
+    id:"porkbutt", name:"Pork Butt", sub:"Bone-in shoulder, for pulling",
+    icon:'<circle cx="12" cy="12" r="8"/><path d="M9 9c1 1.5 1 4.5 0 6"/><path d="M15 9c-1 1.5-1 4.5 0 6"/>',
+    smoker:"225–250°F", weight:"8–10 lb", timeMode:"perLb", timeLow:1.5, timeHigh:2,
+    pull:"203–205°F", rest:"30–60 min",
+    tip:"Forgiving — it's hard to overcook this one before it turns to mush. If in doubt, give it more time, not less.",
+    placement:"Fat cap up, mid heat zone. It renders down over the whole cook and self-bastes.",
+    sauces:["carolina-vinegar","carolina-mustard","kc"]
+  },
+  {
+    id:"ribs", name:"Spare Ribs", sub:"St. Louis cut, per rack",
+    icon:'<path d="M4 6h16"/><path d="M4 10h16"/><path d="M4 14h16"/><path d="M4 18h16"/><path d="M6 4v16"/>',
+    smoker:"225–250°F", weight:"2.5–3.5 lb", timeMode:"flat", timeLow:5, timeHigh:6,
+    pull:"Bend test — probe slides like butter (~195–203°F)", rest:"10–15 min",
+    tip:"3-2-1 works well here: 3 hr smoking, 2 hr wrapped, 1 hr unwrapped to set the bark. Judge by bend, not just the thermometer.",
+    placement:"Bone side down toward the hot side for the first hour, then rotate meaty-side toward the heat.",
+    sauces:["kc","memphis"]
+  },
+  {
+    id:"chicken", name:"Whole Chicken", sub:"4–5 lb bird",
+    icon:'<path d="M12 3c-3 0-5 2.5-5 6 0 4 3 5 3 8 0 2-1.5 3-1.5 3h7s-1.5-1-1.5-3c0-3 3-4 3-8 0-3.5-2-6-5-6Z"/>',
+    smoker:"275–325°F (higher heat, crisp skin)", weight:"4–5 lb", timeMode:"perLb", timeLow:0.35, timeHigh:0.5,
+    pull:"165°F breast / 175°F thigh", rest:"15 min",
+    tip:"Runs hot and quick — the higher smoker temp keeps the skin from turning rubbery.",
+    placement:"Keep it in the cool zone near the stack, away from the direct hot point — it dries out fast if it sits too close.",
+    sauces:["alabama-white","kc"]
+  },
+  {
+    id:"sausage", name:"Sausage", sub:"Fresh links, per string",
+    icon:'<path d="M5 10a4 4 0 0 1 4-4h6a4 4 0 0 1 4 4v4a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4v-4Z"/><path d="M9 6v12"/><path d="M14 6v12"/>',
+    smoker:"225–250°F", weight:"~1 lb", timeMode:"flat", timeLow:2, timeHigh:3,
+    pull:"160°F", rest:"5 min",
+    tip:"Add it later in the cook — it doesn't need the hours the big cuts do, and it'll split if it sits over a hot spot too long.",
+    placement:"Cool zone, away from direct heat. Casings split fast when it's too close to the fire.",
+    sauces:["carolina-mustard","alabama-white"]
+  },
+  {
+    id:"wings", name:"Wings", sub:"2–3 lb batch",
+    icon:'<path d="M4 12c3-6 8-8 12-6 3 1.5 4 4 4 4s-3-1-5 0c3 1 4 3 4 3s-3-1-4.5 0c2 1 2.5 2 2.5 2-4 2-10-1-13-3Z"/>',
+    smoker:"275–300°F", weight:"2–3 lb", timeMode:"flat", timeLow:1, timeHigh:1.5,
+    pull:"175°F (past food-safe, for better texture)", rest:"5 min",
+    tip:"The higher temp is what gets the skin from rubbery to snappy — don't run these low and slow.",
+    placement:"Outer edge of the grate, rotate halfway for even crisping.",
+    sauces:["alabama-white","kc"]
+  }
+];
+
+const SAUCES = [
+  {id:"alabama-white", state:"Alabama", abbr:"AL", name:"Alabama White", tag:"Creamy & peppery", desc:"Mayo, cider vinegar, and cracked black pepper — brushed on, not simmered in. Born in Alabama specifically for smoked chicken.", pairs:"Smoked chicken, wings", spice:2, sweet:1,
+    yield:"Makes about 1½ cups", ingredients:["1 cup mayonnaise","1/3 cup apple cider vinegar","1 tbsp coarse black pepper","1 tbsp prepared horseradish","1 tsp Dijon mustard","1 clove garlic, minced","Salt to taste"],
+    steps:["Whisk everything together in a bowl until smooth.","Chill at least 1 hour before using — it thickens and the flavors settle.","Brush on chicken straight off the smoker; don't simmer it, heat breaks the mayo."]},
+  {id:"alaska-birch", state:"Alaska", abbr:"AK", name:"Birch & Alder Smoke", tag:"Earthy & lightly sweet", desc:"Leans on Alaska's own birch syrup — rarer and less cloying than maple — with a whisper of alder smoke to echo the wood locals actually cook over.", pairs:"Salmon, pork ribs", spice:0, sweet:3,
+    yield:"Makes about 1 cup", ingredients:["1 cup ketchup","1/3 cup birch syrup (or dark maple)","2 tbsp apple cider vinegar","1 tsp smoked salt","1/2 tsp ground allspice","1/4 tsp liquid smoke"],
+    steps:["Combine everything in a small saucepan over medium-low heat.","Simmer 10–12 minutes, stirring often, until it coats a spoon.","Cool before bottling — it thickens more as it sits."]},
+  {id:"arizona-pricklypear", state:"Arizona", abbr:"AZ", name:"Prickly Pear Chipotle", tag:"Fruity & smoky-hot", desc:"Desert prickly pear brings a berry-like sweetness that chipotle and adobo chase down with real smoke and heat. Sonoran in spirit.", pairs:"Brisket, chicken", spice:4, sweet:3,
+    yield:"Makes about 1 cup", ingredients:["1 cup prickly pear juice or puree","2 chipotle peppers in adobo, minced","2 tbsp apple cider vinegar","2 tbsp honey","1 tbsp lime juice","1/2 tsp cumin","Pinch of salt"],
+    steps:["Blend the prickly pear puree with the chipotles until smooth.","Simmer in a saucepan with the rest of the ingredients for 10 minutes.","Strain if you want it smooth, or leave it rustic."]},
+  {id:"arkansas-ozark", state:"Arkansas", abbr:"AR", name:"Ozark Sweet Heat", tag:"Sweet with a kick", desc:"A tomato-brown sugar base loosened up with cayenne and black pepper — sweet first, then it lets you know it's there.", pairs:"Ribs, pulled pork", spice:3, sweet:4,
+    yield:"Makes about 1½ cups", ingredients:["1 cup ketchup","1/4 cup brown sugar","2 tbsp apple cider vinegar","1 tbsp cayenne pepper","1 tsp black pepper","1 tsp Worcestershire sauce","1/2 cup water"],
+    steps:["Whisk everything together in a saucepan.","Bring to a simmer and cook 15 minutes, stirring occasionally.","Adjust cayenne to taste before it fully cools."]},
+  {id:"california-citrus", state:"California", abbr:"CA", name:"California Citrus Chili", tag:"Bright & spicy", desc:"Orange and lime zest cut a Sriracha-leaning chili base — a nod to the citrus groves and the West Coast's love of hot sauce.", pairs:"Chicken, wings", spice:4, sweet:2,
+    yield:"Makes about 1¼ cups", ingredients:["1 cup ketchup","Zest and juice of 1 orange","Zest and juice of 1 lime","2 tbsp Sriracha","2 tbsp honey","1 tsp garlic powder"],
+    steps:["Combine everything in a saucepan over medium heat.","Simmer 10–12 minutes until slightly reduced.","Taste and add more Sriracha for extra heat."]},
+  {id:"colorado-pueblo", state:"Colorado", abbr:"CO", name:"Pueblo Chile Roast", tag:"Roasted & medium-hot", desc:"Built around roasted Pueblo chiles with a dark-roast coffee undertone — high-desert heat with a little altitude bitterness.", pairs:"Brisket, pork butt", spice:4, sweet:1,
+    yield:"Makes about 1½ cups", ingredients:["4 roasted Pueblo or Anaheim chiles, chopped","1 cup tomato sauce","1 tbsp brewed dark-roast coffee","1 tbsp apple cider vinegar","1 tsp brown sugar","1/2 tsp cumin"],
+    steps:["Blend the roasted chiles with the tomato sauce until mostly smooth.","Simmer with the remaining ingredients for 12–15 minutes.","Thin with a splash of water if it's too thick to brush on."]},
+  {id:"connecticut-nutmeg", state:"Connecticut", abbr:"CT", name:"Nutmeg State Spice", tag:"Warm & lightly sweet", desc:"Nutmeg, allspice, and brown sugar — a nod to the state's own nickname — folded into a mellow tomato base.", pairs:"Pulled pork, ribs", spice:1, sweet:3,
+    yield:"Makes about 1¼ cups", ingredients:["1 cup ketchup","3 tbsp brown sugar","1/2 tsp ground nutmeg","1/4 tsp allspice","2 tbsp apple cider vinegar","1 tbsp Worcestershire sauce"],
+    steps:["Whisk everything together in a small saucepan.","Simmer 10 minutes over low heat, stirring often.","Let cool — the nutmeg mellows and rounds out as it sits."]},
+  {id:"delaware-delmarva", state:"Delaware", abbr:"DE", name:"Delmarva Chicken Glaze", tag:"Sweet & sticky", desc:"A honey-forward glaze built for poultry, straight out of the peninsula that put commercial chicken farming on the map.", pairs:"Whole chicken, wings", spice:1, sweet:4,
+    yield:"Makes about ¾ cup", ingredients:["1/2 cup honey","1/4 cup Dijon mustard","2 tbsp apple cider vinegar","1 tbsp melted butter","1/2 tsp paprika","Pinch of cayenne"],
+    steps:["Whisk everything together until smooth — no cooking required.","Warm gently if you want it thinner for brushing.","Apply in the last 10–15 minutes of cooking so it doesn't burn."]},
+  {id:"florida-citrusmojo", state:"Florida", abbr:"FL", name:"Florida Citrus Mojo", tag:"Tangy & garlicky", desc:"Sour orange, garlic, and cumin — a BBQ-leaning take on the Cuban mojo marinade that's all over South Florida.", pairs:"Pulled pork, chicken", spice:2, sweet:2,
+    yield:"Makes about 1 cup", ingredients:["1/2 cup sour orange juice (or 1/3 cup orange + 2 tbsp lime juice)","6 cloves garlic, minced","1 tsp ground cumin","1/4 cup olive oil","1 tsp oregano","Salt to taste"],
+    steps:["Whisk the citrus juice, garlic, cumin, and oregano together.","Slowly whisk in the olive oil to emulsify.","Use fresh — this is a bright finishing sauce, not a long-simmer sauce."]},
+  {id:"georgia-peach", state:"Georgia", abbr:"GA", name:"Georgia Peach Bourbon", tag:"Sweet & boozy", desc:"Real peach puree and a slug of bourbon over a tomato base — Georgia's signature fruit doing exactly what it does best.", pairs:"Ribs, chicken", spice:1, sweet:5,
+    yield:"Makes about 1½ cups", ingredients:["2 ripe peaches, peeled and chopped (or 1 cup peach puree)","1 cup ketchup","1/4 cup bourbon","2 tbsp brown sugar","1 tbsp apple cider vinegar"],
+    steps:["Simmer the peaches down with the bourbon until soft, about 8 minutes.","Blend smooth, then return to the pot with the remaining ingredients.","Simmer another 10 minutes until thickened."]},
+  {id:"hawaii-hulihuli", state:"Hawaii", abbr:"HI", name:"Huli-Huli Pineapple", tag:"Sweet & tropical", desc:"Pineapple juice, soy, ginger, and brown sugar — the glaze behind Hawaii's famous roadside huli-huli chicken.", pairs:"Whole chicken, sausage", spice:1, sweet:5,
+    yield:"Makes about 1½ cups", ingredients:["1 cup pineapple juice","1/3 cup soy sauce","1/4 cup brown sugar","2 tbsp ketchup","1 tbsp grated ginger","2 cloves garlic, minced"],
+    steps:["Combine everything in a saucepan over medium heat.","Simmer 15–20 minutes until reduced by about a third.","Reserve some unglazed sauce for basting raw meat; use the cooked batch to finish."]},
+  {id:"idaho-goldenhoney", state:"Idaho", abbr:"ID", name:"Idaho Golden Honey-Mustard", tag:"Sweet & tangy", desc:"Clover honey and stone-ground mustard, kept simple and golden — Gem State plain-spoken.", pairs:"Pulled pork, chicken, sausage", spice:1, sweet:4,
+    yield:"Makes about 1 cup", ingredients:["1/2 cup yellow mustard","1/3 cup honey","2 tbsp apple cider vinegar","1 tbsp mayonnaise (optional, for creaminess)","1/4 tsp black pepper"],
+    steps:["Whisk everything together until smooth.","No cooking needed — chill 30 minutes so the flavors meld.","Thin with a little water if it's too thick to brush."]},
+  {id:"illinois-mumbo", state:"Illinois", abbr:"IL", name:"Chicago Mumbo-Style", tag:"Sweet, tangy & a little hot", desc:"Ketchup-based with a vinegar snap and a splash of hot sauce — inspired by the mumbo sauce that shows up at Chicago rib joints.", pairs:"Ribs, rib tips", spice:2, sweet:4,
+    yield:"Makes about 1¼ cups", ingredients:["1 cup ketchup","1/4 cup water","2 tbsp apple cider vinegar","2 tbsp brown sugar","1 tbsp hot sauce","1 tsp garlic powder"],
+    steps:["Whisk everything together in a saucepan.","Simmer 10 minutes, stirring occasionally.","Adjust hot sauce to taste — it should have a little kick under the sweetness."]},
+  {id:"indiana-hoosier", state:"Indiana", abbr:"IN", name:"Hoosier Brown Sugar Bourbon", tag:"Sweet & smoky", desc:"A straightforward brown sugar and bourbon tomato sauce — Midwest comfort food energy, no surprises.", pairs:"Ribs, pulled pork", spice:1, sweet:4,
+    yield:"Makes about 1½ cups", ingredients:["1 cup ketchup","1/3 cup brown sugar","3 tbsp bourbon","1 tbsp Worcestershire sauce","1 tsp smoked paprika","1/2 cup water"],
+    steps:["Combine everything in a saucepan over medium heat.","Simmer 15 minutes, stirring occasionally, until glossy.","Let the alcohol cook off for the first few minutes before covering."]},
+  {id:"iowa-porkbelt", state:"Iowa", abbr:"IA", name:"Iowa Pork Belt Classic", tag:"Rich & smoky-sweet", desc:"A thick, hog-country tomato sauce built with the state that raises more pigs than anywhere else in the country in mind.", pairs:"Pork butt, ribs", spice:1, sweet:4,
+    yield:"Makes about 1½ cups", ingredients:["1 cup ketchup","1/4 cup brown sugar","2 tbsp molasses","2 tbsp apple cider vinegar","1 tsp smoked paprika","1/2 tsp garlic powder"],
+    steps:["Whisk everything together in a saucepan.","Simmer 15–20 minutes until thick enough to coat a spoon.","This one's built to hold up on pulled pork — don't thin it out too much."]},
+  {id:"kansas-sorghum", state:"Kansas", abbr:"KS", name:"Kansas Sorghum Sweet", tag:"Deep & molasses-sweet", desc:"Sorghum syrup instead of molasses gives this one a deeper, earthier sweetness — a Great Plains crop most sauces overlook.", pairs:"Ribs, brisket", spice:1, sweet:4,
+    yield:"Makes about 1½ cups", ingredients:["1 cup ketchup","1/3 cup sorghum syrup","2 tbsp apple cider vinegar","1 tsp black pepper","1/2 tsp cayenne","1/2 cup water"],
+    steps:["Combine everything in a saucepan over medium-low heat.","Simmer 15 minutes, stirring often so the sorghum doesn't scorch.","Cool before bottling — it thickens as it sits."]},
+  {id:"kentucky-black", state:"Kentucky", abbr:"KY", name:"Kentucky Black", tag:"Peppery & sharp", desc:"Worcestershire, vinegar, and black pepper, no tomato at all — the real dipping sauce behind Owensboro's mutton BBQ tradition.", pairs:"Brisket, pork butt", spice:3, sweet:1,
+    yield:"Makes about 1¾ cups", ingredients:["1 cup Worcestershire sauce","1/2 cup apple cider vinegar","1/4 cup water","2 tbsp black pepper","1 tbsp brown sugar","1 tsp hot sauce"],
+    steps:["Whisk everything together in a saucepan.","Simmer 8–10 minutes — it stays thin, that's the point.","Serve warm on the side for dipping, the traditional Owensboro way."]},
+  {id:"louisiana-cajunfire", state:"Louisiana", abbr:"LA", name:"Cajun Fire", tag:"Hot & bold", desc:"Cayenne, garlic, and a shot of hot sauce over a dark tomato base — built with the same backbone as a good gumbo.", pairs:"Sausage, ribs", spice:5, sweet:1,
+    yield:"Makes about 1¼ cups", ingredients:["1 cup tomato sauce","1/4 cup hot sauce","2 tbsp apple cider vinegar","1 tbsp cayenne pepper","2 cloves garlic, minced","1 tsp smoked paprika"],
+    steps:["Combine everything in a saucepan over medium heat.","Simmer 15 minutes, stirring often.","Taste before adding more cayenne — this one's meant to have real heat."]},
+  {id:"maine-blueberry", state:"Maine", abbr:"ME", name:"Wild Blueberry BBQ", tag:"Fruity & tart-sweet", desc:"Maine's wild blueberries, simmered down with a little vinegar so it doesn't turn into jam — tart enough to still read as barbecue.", pairs:"Chicken, ribs", spice:0, sweet:4,
+    yield:"Makes about 1¼ cups", ingredients:["1 cup fresh or frozen wild blueberries","1/2 cup ketchup","2 tbsp apple cider vinegar","2 tbsp brown sugar","1/2 tsp black pepper"],
+    steps:["Simmer the blueberries in a saucepan until they break down, about 8 minutes.","Mash or blend, then stir in the remaining ingredients.","Simmer another 10 minutes until thickened."]},
+  {id:"maryland-chesapeake", state:"Maryland", abbr:"MD", name:"Chesapeake Bay Gold", tag:"Peppery & briny-sweet", desc:"Celery seed, paprika, and cracked pepper — the same bay-spice character the Chesapeake is known for, worked into a tomato base.", pairs:"Chicken, sausage", spice:3, sweet:2,
+    yield:"Makes about 1¼ cups", ingredients:["1 cup tomato sauce","1 tbsp celery seed","1 tbsp paprika","1 tsp black pepper","1/2 tsp cayenne","2 tbsp apple cider vinegar","2 tbsp brown sugar"],
+    steps:["Whisk everything together in a saucepan.","Simmer 12–15 minutes, stirring occasionally.","Let it cool a bit — the celery seed flavor blooms as it sits."]},
+  {id:"massachusetts-cranberry", state:"Massachusetts", abbr:"MA", name:"Cranberry Molasses", tag:"Tart & rich", desc:"Cranberry and blackstrap molasses — New England's bog crop meeting its baked-bean pantry staple.", pairs:"Pork butt, chicken", spice:0, sweet:4,
+    yield:"Makes about 1¼ cups", ingredients:["1 cup fresh or frozen cranberries","1/2 cup water","1/4 cup blackstrap molasses","2 tbsp apple cider vinegar","1/2 tsp cinnamon"],
+    steps:["Simmer the cranberries in water until they pop, about 8 minutes.","Blend smooth, then stir in the molasses, vinegar, and cinnamon.","Simmer another 8–10 minutes until it thickens."]},
+  {id:"michigan-cherry", state:"Michigan", abbr:"MI", name:"Cherry Chipotle", tag:"Fruity & smoky-hot", desc:"Traverse City tart cherries against chipotle heat — sweet up front, smoky heat right behind it.", pairs:"Ribs, chicken", spice:3, sweet:4,
+    yield:"Makes about 1¼ cups", ingredients:["1 cup pitted tart cherries, fresh or frozen","2 chipotle peppers in adobo, minced","1/4 cup ketchup","2 tbsp brown sugar","1 tbsp apple cider vinegar"],
+    steps:["Simmer the cherries until soft, about 8 minutes, then mash or blend.","Stir in the remaining ingredients and simmer 10 more minutes.","Adjust chipotle for more or less smoky heat."]},
+  {id:"minnesota-lingonberry", state:"Minnesota", abbr:"MN", name:"Lingonberry Mustard", tag:"Tart & tangy", desc:"A nod to the state's deep Scandinavian roots — tart lingonberry against a sharp mustard base instead of tomato.", pairs:"Pulled pork, sausage", spice:1, sweet:3,
+    yield:"Makes about 1 cup", ingredients:["1/2 cup lingonberry preserves (or cranberry sauce)","1/3 cup yellow mustard","2 tbsp apple cider vinegar","1 tbsp brown sugar"],
+    steps:["Whisk everything together in a small saucepan.","Simmer 5–8 minutes, just until smooth and glossy.","No need to cook it long — the tartness is the point."]},
+  {id:"mississippi-hottamale", state:"Mississippi", abbr:"MS", name:"Delta Hot Tamale Style", tag:"Spiced & smoky", desc:"Chili-forward and cumin-heavy — built around the same spice blend behind the Mississippi Delta's famous hot tamales.", pairs:"Pork butt, brisket", spice:4, sweet:2,
+    yield:"Makes about 1¼ cups", ingredients:["1 cup tomato sauce","1 tbsp chili powder","1 tsp cumin","1/2 tsp cayenne","2 tbsp apple cider vinegar","1 tbsp brown sugar"],
+    steps:["Whisk everything together in a saucepan.","Simmer 12–15 minutes, stirring occasionally, until deepened in color.","This one leans savory-spiced rather than sweet — taste as you go."]},
+  {id:"kc", state:"Missouri", abbr:"MO", name:"Kansas City Classic", tag:"Sweet & tangy", desc:"Thick, tomato-and-molasses, with real sweetness and a mild tang. Kansas City sits mostly in Missouri, and this is the sauce that made the style famous.", pairs:"Ribs, pulled pork, chicken", spice:1, sweet:4,
+    yield:"Makes about 1½ cups", ingredients:["1 cup ketchup","1/4 cup molasses","1/4 cup brown sugar","2 tbsp apple cider vinegar","1 tbsp Worcestershire sauce","1 tsp smoked paprika","1/2 tsp garlic powder"],
+    steps:["Combine everything in a saucepan over medium heat.","Bring to a simmer and cook 15–20 minutes, stirring occasionally, until thick and glossy.","Cool before bottling — it thickens more as it sits."]},
+  {id:"montana-huckleberry", state:"Montana", abbr:"MT", name:"Big Sky Huckleberry", tag:"Wild & fruity-sweet", desc:"Wild huckleberry, the unofficial fruit of Montana's backcountry, balanced against a good hit of black pepper so it doesn't go dessert-sweet.", pairs:"Ribs, chicken", spice:1, sweet:4,
+    yield:"Makes about 1¼ cups", ingredients:["1 cup huckleberries (or blueberries)","1/2 cup ketchup","2 tbsp apple cider vinegar","1 tbsp brown sugar","1/2 tsp black pepper"],
+    steps:["Simmer the huckleberries until they break down, about 8 minutes.","Mash or blend, then stir in the remaining ingredients.","Simmer 10 more minutes until thickened — keep the pepper present so it doesn't read as jam."]},
+  {id:"nebraska-steakhouse", state:"Nebraska", abbr:"NE", name:"Steakhouse Peppercorn", tag:"Bold & peppery", desc:"Cracked peppercorn and a beefy Worcestershire backbone — built for a state that raises more cattle than it has people.", pairs:"Brisket", spice:3, sweet:2,
+    yield:"Makes about 1¼ cups", ingredients:["1 cup ketchup","2 tbsp cracked black peppercorns","1 tbsp Worcestershire sauce","1 tbsp brown sugar","1 tbsp apple cider vinegar"],
+    steps:["Combine everything in a saucepan over medium heat.","Simmer 12 minutes, stirring occasionally.","Let the peppercorns steep off the heat for a few minutes before serving for more bite."]},
+  {id:"nevada-highroller", state:"Nevada", abbr:"NV", name:"High Roller Whiskey Glaze", tag:"Sweet & smoky-boozy", desc:"A dark whiskey-brown sugar glaze with enough shine to look at home under Vegas lights.", pairs:"Ribs, brisket", spice:1, sweet:4,
+    yield:"Makes about 1½ cups", ingredients:["1 cup ketchup","1/3 cup brown sugar","1/4 cup whiskey","1 tbsp Worcestershire sauce","1/2 tsp smoked paprika"],
+    steps:["Combine everything in a saucepan over medium heat.","Simmer 15 minutes, stirring occasionally, letting the whiskey cook down.","It should look glossy and coat the back of a spoon when it's ready."]},
+  {id:"newhampshire-granite", state:"New Hampshire", abbr:"NH", name:"Granite State Pepper", tag:"Sharp & peppery", desc:"Cracked pepper and a dry-white-wine vinegar tang — no-nonsense, live-free-or-die energy in sauce form.", pairs:"Chicken, sausage", spice:3, sweet:1,
+    yield:"Makes about ¾ cup", ingredients:["1/2 cup apple cider vinegar","1/4 cup water","1 tbsp cracked black pepper","1 tsp red pepper flakes","1 tsp sugar","Salt to taste"],
+    steps:["Whisk everything together in a bowl.","No cooking needed — let it sit at least 30 minutes so the pepper infuses.","Shake well before using; it separates."]},
+  {id:"newjersey-tomato", state:"New Jersey", abbr:"NJ", name:"Jersey Tomato Garden", tag:"Bright & fresh-sweet", desc:"Built around famously sweet Jersey tomatoes with fresh basil instead of heavy smoke — closer to a marinara than a typical BBQ sauce.", pairs:"Chicken, sausage", spice:1, sweet:3,
+    yield:"Makes about 1½ cups", ingredients:["2 cups ripe tomatoes, chopped (or 1 cup crushed tomatoes)","2 tbsp olive oil","3 cloves garlic, minced","2 tbsp fresh basil, chopped","1 tbsp apple cider vinegar","Salt and pepper to taste"],
+    steps:["Sauté the garlic in olive oil for a minute, then add the tomatoes.","Simmer 15–20 minutes until broken down, then blend if you want it smooth.","Stir in the basil and vinegar off the heat so the basil stays bright."]},
+  {id:"newmexico-hatch", state:"New Mexico", abbr:"NM", name:"Hatch Green Chile", tag:"Earthy & medium-hot", desc:"Roasted Hatch green chile, the ingredient New Mexico built an entire state identity around, blended into a thin, savory sauce.", pairs:"Brisket, pork butt, chicken", spice:4, sweet:1,
+    yield:"Makes about 1½ cups", ingredients:["1 cup roasted, diced Hatch green chiles","1/2 cup chicken or vegetable stock","1/2 small onion, diced","2 cloves garlic, minced","1/2 tsp cumin","Juice of 1/2 lime"],
+    steps:["Sauté the onion and garlic until soft, about 4 minutes.","Add the chiles, stock, and cumin, and simmer 15 minutes.","Blend to your preferred texture and finish with lime juice."]},
+  {id:"newyork-apple", state:"New York", abbr:"NY", name:"Apple Orchard Bourbon", tag:"Sweet & smooth", desc:"Upstate apple butter and bourbon over a mellow tomato base — orchard country by way of the Hudson Valley.", pairs:"Ribs, pork butt", spice:1, sweet:4,
+    yield:"Makes about 1½ cups", ingredients:["1/2 cup apple butter","1/2 cup ketchup","1/4 cup bourbon","2 tbsp apple cider vinegar","1 tbsp brown sugar"],
+    steps:["Combine everything in a saucepan over medium heat.","Simmer 12–15 minutes, stirring occasionally, until the alcohol cooks off.","Should be smooth and pourable, not chunky — blend if needed."]},
+  {id:"carolina-vinegar", state:"North Carolina", abbr:"NC", name:"Eastern Carolina Vinegar", tag:"Sharp & thin", desc:"Just vinegar, pepper flake, and a little heat. No tomato. Cuts through fat instead of covering it up.", pairs:"Pulled pork", spice:3, sweet:0,
+    yield:"Makes about 1 cup", ingredients:["1 cup apple cider vinegar","1 tbsp red pepper flakes","1 tbsp brown sugar","2 tsp black pepper","1 tsp salt","1/2 tsp cayenne"],
+    steps:["Whisk everything together in a bowl or jar.","No cooking required — let it sit at least an hour so the pepper flakes bloom.","Shake before each use; it's meant to stay thin."]},
+  {id:"northdakota-honey", state:"North Dakota", abbr:"ND", name:"Prairie Honey", tag:"Sweet & floral", desc:"Straight prairie clover honey against cider vinegar — fitting for the state that produces more honey than any other.", pairs:"Chicken, ribs", spice:0, sweet:4,
+    yield:"Makes about ¾ cup", ingredients:["1/2 cup clover honey","1/4 cup apple cider vinegar","1 tbsp Dijon mustard","1/2 tsp black pepper","Pinch of salt"],
+    steps:["Whisk everything together until smooth.","Warm slightly if the honey is too thick to combine easily.","No simmering needed — this one stays bright and simple."]},
+  {id:"ohio-cincinnati", state:"Ohio", abbr:"OH", name:"Cincinnati Cinnamon-Cocoa", tag:"Warm & unexpected", desc:"Cinnamon, cocoa, and allspice worked into a tomato base — the same odd, wonderful spice logic behind Cincinnati chili.", pairs:"Brisket, pork butt", spice:2, sweet:3,
+    yield:"Makes about 1¼ cups", ingredients:["1 cup tomato sauce","1 tbsp unsweetened cocoa powder","1 tsp ground cinnamon","1/2 tsp allspice","2 tbsp brown sugar","1 tbsp apple cider vinegar"],
+    steps:["Whisk everything together in a saucepan.","Simmer 12–15 minutes, stirring often so the cocoa doesn't clump.","Taste for balance — it should read savory first, sweet-spiced second."]},
+  {id:"oklahoma-onion", state:"Oklahoma", abbr:"OK", name:"Charred Onion Smoke", tag:"Savory & smoky-sweet", desc:"Deeply caramelized, charred onion folded into the base — a nod to Oklahoma's fried-onion-burger tradition.", pairs:"Brisket, sausage", spice:2, sweet:3,
+    yield:"Makes about 1½ cups", ingredients:["1 large onion, sliced","1 tbsp oil","1 cup ketchup","2 tbsp apple cider vinegar","1 tbsp brown sugar","1/2 tsp smoked paprika"],
+    steps:["Char the onion slices in a hot, dry skillet or on the grill until blackened in spots.","Chop or blend the charred onion, then combine with the remaining ingredients in a saucepan.","Simmer 12–15 minutes until thickened."]},
+  {id:"oregon-hazelnutmarion", state:"Oregon", abbr:"OR", name:"Hazelnut & Marionberry", tag:"Nutty & fruity-sweet", desc:"Toasted hazelnut and Marionberry, both practically native to Oregon farm country, folded into a dark, rich glaze.", pairs:"Ribs, chicken", spice:0, sweet:4,
+    yield:"Makes about 1¼ cups", ingredients:["1 cup Marionberries (or blackberries)","1/4 cup toasted hazelnuts, finely chopped","1/2 cup ketchup","2 tbsp brown sugar","1 tbsp apple cider vinegar"],
+    steps:["Simmer the berries until they break down, about 8 minutes, then strain out seeds if you like.","Stir in the ketchup, sugar, and vinegar and simmer 10 more minutes.","Fold in the toasted hazelnuts at the end for texture."]},
+  {id:"pennsylvania-dutch", state:"Pennsylvania", abbr:"PA", name:"PA Dutch Apple Butter", tag:"Sweet & spiced", desc:"Apple butter and brown sugar with a little clove — straight out of Pennsylvania Dutch country pantries.", pairs:"Pulled pork, sausage", spice:0, sweet:4,
+    yield:"Makes about 1¼ cups", ingredients:["1 cup apple butter","1/4 cup brown sugar","2 tbsp apple cider vinegar","1/2 tsp ground clove","1/4 tsp cinnamon"],
+    steps:["Combine everything in a small saucepan over low heat.","Simmer 8–10 minutes, stirring often, until glossy.","Thin with a splash of water or apple cider if it's too thick to brush."]},
+  {id:"rhodeisland-coffeemilk", state:"Rhode Island", abbr:"RI", name:"Coffee Milk BBQ", tag:"Sweet & roasty", desc:"A splash of coffee syrup — Rhode Island's official state drink — stirred into a dark, molasses-forward sauce for a roasty edge.", pairs:"Ribs, pork butt", spice:1, sweet:4,
+    yield:"Makes about 1¼ cups", ingredients:["1 cup ketchup","1/4 cup coffee syrup (or 2 tbsp strong espresso + 2 tbsp brown sugar)","2 tbsp molasses","1 tbsp apple cider vinegar"],
+    steps:["Combine everything in a saucepan over medium heat.","Simmer 12–15 minutes, stirring occasionally, until deep and glossy.","The coffee note should read as roasty depth, not like actual coffee."]},
+  {id:"carolina-mustard", state:"South Carolina", abbr:"SC", name:"South Carolina Gold", tag:"Tangy mustard", desc:"Yellow mustard base with vinegar and a touch of sweetness — the signature style of the state's German-settled Midlands.", pairs:"Pulled pork, chicken, sausage", spice:1, sweet:2,
+    yield:"Makes about 1½ cups", ingredients:["1 cup yellow mustard","1/3 cup brown sugar","1/4 cup apple cider vinegar","2 tbsp butter","1 tsp Worcestershire sauce","1/4 tsp cayenne"],
+    steps:["Combine everything in a saucepan over medium-low heat.","Simmer 10 minutes, stirring often, until the butter melts in and it's glossy.","Don't let it boil hard — mustard can turn bitter if it scorches."]},
+  {id:"southdakota-bison", state:"South Dakota", abbr:"SD", name:"Black Hills Peppercorn", tag:"Bold & peppery-sweet", desc:"Coarse pepper and brown sugar built with bison and Black Hills ranch country in mind — bold enough to stand up to game meat.", pairs:"Brisket", spice:3, sweet:3,
+    yield:"Makes about 1¼ cups", ingredients:["1 cup ketchup","2 tbsp cracked black pepper","2 tbsp brown sugar","1 tbsp apple cider vinegar","1 tsp Worcestershire sauce"],
+    steps:["Combine everything in a saucepan over medium heat.","Simmer 12 minutes, stirring occasionally.","Built bold on purpose — good with rich, gamey meat like bison or brisket."]},
+  {id:"memphis", state:"Tennessee", abbr:"TN", name:"Memphis Style", tag:"Sweet & tangy, on the side", desc:"Same family as Kansas City but thinner, and usually served on the side so the dry rub stays the star.", pairs:"Ribs", spice:1, sweet:3,
+    yield:"Makes about 1½ cups", ingredients:["1 cup ketchup","1/4 cup apple cider vinegar","1/4 cup brown sugar","1 tbsp yellow mustard","1 tsp Worcestershire sauce","1/2 tsp cayenne"],
+    steps:["Whisk everything together in a saucepan.","Simmer 10–12 minutes — keep it thinner than a Kansas City sauce.","Serve it on the side rather than mopped on, so the rub stays the star."]},
+  {id:"texas", state:"Texas", abbr:"TX", name:"Texas Mop", tag:"Thin & peppery", desc:"Thin, vinegar-and-pepper, sometimes not tomato-based at all. Built to baste, not to coat — lets the bark and smoke do the talking.", pairs:"Brisket", spice:3, sweet:0,
+    yield:"Makes about 1½ cups", ingredients:["1 cup apple cider vinegar","1/2 cup water","2 tbsp Worcestershire sauce","1 tbsp black pepper","1 tsp cayenne","1 tsp hot sauce"],
+    steps:["Whisk everything together in a bowl or jar — no cooking needed.","Warm gently if you're mopping it onto meat mid-cook.","Apply with a real mop or brush every hour or so; it's thin on purpose."]},
+  {id:"utah-frysauce", state:"Utah", abbr:"UT", name:"Utah Fry Sauce BBQ", tag:"Creamy & sweet-tangy", desc:"Ketchup and mayo, Utah's iconic fry sauce, smoked-paprika'd and thinned out into something you'd actually brush on meat.", pairs:"Chicken, sausage", spice:0, sweet:3,
+    yield:"Makes about 1 cup", ingredients:["1/2 cup ketchup","1/2 cup mayonnaise","1 tsp smoked paprika","1 tsp apple cider vinegar","Pinch of garlic powder"],
+    steps:["Whisk everything together until smooth — no cooking required.","Chill at least 30 minutes before using.","Thin slightly with water if you want to brush rather than dip."]},
+  {id:"vermont-maple", state:"Vermont", abbr:"VT", name:"Vermont Maple Bourbon", tag:"Sweet & rich", desc:"Real maple syrup and a little bourbon — about as Vermont as a sauce can get.", pairs:"Ribs, pork butt", spice:0, sweet:5,
+    yield:"Makes about 1¼ cups", ingredients:["1 cup pure maple syrup","1/4 cup ketchup","3 tbsp bourbon","1 tbsp apple cider vinegar","1/2 tsp black pepper"],
+    steps:["Combine everything in a saucepan over medium heat.","Simmer 12–15 minutes, letting the bourbon cook down, until it thickens slightly.","Watch it near the end — maple syrup can scorch fast."]},
+  {id:"virginia-piedmont", state:"Virginia", abbr:"VA", name:"Virginia Piedmont", tag:"Balanced & light", desc:"A lighter tomato-vinegar hybrid, less sweet than Kansas City and less sharp than eastern Carolina — from the state that's arguably where American BBQ started.", pairs:"Pork butt, chicken", spice:2, sweet:2,
+    yield:"Makes about 1 cup", ingredients:["1/2 cup ketchup","1/2 cup apple cider vinegar","2 tbsp brown sugar","1 tsp black pepper","1/2 tsp red pepper flakes"],
+    steps:["Whisk everything together in a saucepan.","Simmer 10 minutes — this one stays thinner than a full tomato sauce.","Balance is the goal here: not as sweet as Kansas City, not as sharp as eastern Carolina."]},
+  {id:"washington-appleespresso", state:"Washington", abbr:"WA", name:"Apple-Espresso BBQ", tag:"Sweet & bold", desc:"Washington apples and a shot of dark-roast espresso — orchard country meets Seattle coffee culture.", pairs:"Ribs, brisket", spice:1, sweet:4,
+    yield:"Makes about 1¼ cups", ingredients:["1/2 cup apple butter or applesauce","1/2 cup ketchup","2 tbsp brewed espresso (or strong coffee)","2 tbsp brown sugar","1 tbsp apple cider vinegar"],
+    steps:["Combine everything in a saucepan over medium heat.","Simmer 12–15 minutes, stirring occasionally, until glossy.","The espresso should deepen the sauce, not make it taste like coffee — start with less if unsure."]},
+  {id:"westvirginia-ramp", state:"West Virginia", abbr:"WV", name:"Ramp & Molasses", tag:"Wild & savory-sweet", desc:"Wild ramps — the Appalachian spring onion everybody in West Virginia goes foraging for — against blackstrap molasses.", pairs:"Pork butt, sausage", spice:2, sweet:3,
+    yield:"Makes about 1 cup", ingredients:["1/2 cup chopped ramps (or scallions plus 1 clove garlic)","1 tbsp oil","1/2 cup blackstrap molasses","1/4 cup apple cider vinegar","1/2 tsp black pepper"],
+    steps:["Sauté the ramps in oil until soft and fragrant, about 3 minutes.","Add the molasses, vinegar, and pepper and simmer 10 minutes.","Blend if you want it smooth, or leave the ramps rustic."]},
+  {id:"wisconsin-amberale", state:"Wisconsin", abbr:"WI", name:"Wisconsin Amber Ale", tag:"Malty & smoky-sweet", desc:"Reduced amber ale and brown sugar — built for a state that takes its beer and its brats equally seriously.", pairs:"Sausage, ribs", spice:1, sweet:3,
+    yield:"Makes about 1¼ cups", ingredients:["1 cup amber ale","1/2 cup ketchup","2 tbsp brown sugar","1 tbsp apple cider vinegar","1 tsp Worcestershire sauce"],
+    steps:["Simmer the beer alone in a saucepan for 5 minutes to reduce slightly.","Add the remaining ingredients and simmer 12–15 more minutes.","Should end up glossy and thick enough to cling to a bratwurst."]},
+  {id:"wyoming-sagebrush", state:"Wyoming", abbr:"WY", name:"Sagebrush Peppercorn", tag:"Wild & peppery", desc:"Cracked pepper with a faint sage note, built for wide-open cattle country.", pairs:"Brisket, chicken", spice:3, sweet:1,
+    yield:"Makes about 1¼ cups", ingredients:["1 cup ketchup","2 tbsp cracked black pepper","1 tsp dried sage","1 tbsp brown sugar","1 tbsp apple cider vinegar"],
+    steps:["Combine everything in a saucepan over medium heat.","Simmer 12 minutes, stirring occasionally.","Go easy on the sage — it should be a background note, not the headline."]}
+];
+
+const ICONS_WRAP = (svg) => `<svg viewBox="0 0 24 24">${svg}</svg>`;
+
+function renderMeats(){
+  const wrap = document.getElementById('meatCards');
+  wrap.innerHTML = MEATS.map(m => `
+    <div class="card meat-card">
+      <div class="meat-head">
+        <div class="meat-icon">${ICONS_WRAP(m.icon)}</div>
+        <div>
+          <h3>${m.name}</h3>
+          <span>${m.sub}</span>
+        </div>
+      </div>
+      <div class="stat-grid">
+        <div class="stat"><label>Smoker temp</label><div class="v hot mono">${m.smoker}</div></div>
+        <div class="stat"><label>Typical weight</label><div class="v mono">${m.weight}</div></div>
+        <div class="stat"><label>Cook time</label><div class="v mono">${timeLabel(m)}</div></div>
+        <div class="stat"><label>Pull temp</label><div class="v mono">${m.pull}</div></div>
+        <div class="stat"><label>Rest</label><div class="v mono">${m.rest}</div></div>
+      </div>
+      <div class="tip"><span>🔥</span><p style="margin:0"><b>Heads up —</b> ${m.tip}</p></div>
+      <div class="pairs"><b>Placement:</b> ${m.placement}</div>
+      <div class="pairs"><b>Pairs with:</b> ${m.sauces.map(id => SAUCES.find(s=>s.id===id).name).join(", ")}</div>
+    </div>
+  `).join("");
+}
+
+function timeLabel(m){
+  if(m.timeMode === "perLb") return `${m.timeLow}–${m.timeHigh} hr/lb`;
+  return `${m.timeLow}–${m.timeHigh} hr total`;
+}
+
+let sauceQuery = "";
+let activeChip = null;
+
+function dots(level, cls){
+  let out = "";
+  for(let i=1;i<=5;i++){
+    out += `<span class="pip ${i<=level ? "on "+cls : ""}"></span>`;
+  }
+  return out;
+}
+
+function matchesSauceFilters(s){
+  const q = sauceQuery.trim().toLowerCase();
+  const textMatch = !q || [s.state, s.name, s.tag, s.abbr].join(" ").toLowerCase().includes(q);
+  let chipMatch = true;
+  if(activeChip === "spicy") chipMatch = s.spice >= 3;
+  else if(activeChip === "sweet") chipMatch = s.sweet >= 3;
+  else if(activeChip === "mild") chipMatch = s.spice <= 1;
+  return textMatch && chipMatch;
+}
+
+function renderSauces(){
+  const wrap = document.getElementById('sauceCards');
+  const list = SAUCES.filter(matchesSauceFilters);
+  if(!list.length){
+    wrap.innerHTML = `<p class="lede">No sauces match that — try clearing the search or filter.</p>`;
+    return;
+  }
+  wrap.innerHTML = list.map(s => `
+    <div class="card sauce-card">
+      <div class="sauce-head">
+        <div>
+          <h3>${s.name}</h3>
+          <span>${s.state}</span>
+        </div>
+        <span class="state-badge">${s.abbr}</span>
+      </div>
+      <div class="sauce-tag">${s.tag}</div>
+      <p class="pairs" style="margin-top:8px;">${s.desc}</p>
+      <div class="stat-grid" style="grid-template-columns:1fr 1fr; margin:10px 0;">
+        <div class="stat"><label>Spice</label><div class="rating">${dots(s.spice,"ember")}</div></div>
+        <div class="stat"><label>Sweet</label><div class="rating">${dots(s.sweet,"mustard")}</div></div>
+      </div>
+      <p class="pairs"><b>Best with:</b> ${s.pairs}</p>
+      <details class="recipe">
+        <summary>Recipe</summary>
+        <div class="recipe-body">
+          <p class="recipe-yield">${s.yield}</p>
+          <h4>Ingredients</h4>
+          <ul>${s.ingredients.map(i => `<li>${i}</li>`).join("")}</ul>
+          <h4>Method</h4>
+          <ol>${s.steps.map(st => `<li>${st}</li>`).join("")}</ol>
+        </div>
+      </details>
+    </div>
+  `).join("");
+}
+
+function initSauceFilters(){
+  const search = document.getElementById('sauceSearch');
+  search.addEventListener('input', (e) => { sauceQuery = e.target.value; renderSauces(); });
+  document.querySelectorAll('.filter-chip').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const f = btn.dataset.filter;
+      activeChip = activeChip === f ? null : f;
+      document.querySelectorAll('.filter-chip').forEach(b => b.classList.toggle('active', b.dataset.filter === activeChip));
+      renderSauces();
+    });
+  });
+}
+
+function populateCalc(){
+  const sel = document.getElementById('calcMeat');
+  sel.innerHTML = MEATS.map(m => `<option value="${m.id}">${m.name}</option>`).join("");
+}
+
+function fmtTime(mins){
+  const d = new Date();
+  d.setHours(0,0,0,0);
+  d.setMinutes(((mins % 1440) + 1440) % 1440);
+  let h = d.getHours(), m = d.getMinutes();
+  const ap = h >= 12 ? "PM" : "AM";
+  h = h % 12; if(h===0) h = 12;
+  return `${h}:${String(m).padStart(2,"0")} ${ap}`;
+}
+
+function runCalc(){
+  const meat = MEATS.find(m => m.id === document.getElementById('calcMeat').value);
+  const weight = parseFloat(document.getElementById('calcWeight').value) || 0;
+  const mode = document.getElementById('calcMode').value;
+  const timeVal = document.getElementById('calcTime').value;
+  let lowHr, highHr;
+  if(meat.timeMode === "perLb"){ lowHr = meat.timeLow * weight; highHr = meat.timeHigh * weight; }
+  else { lowHr = meat.timeLow; highHr = meat.timeHigh; }
+
+  document.getElementById('resultRange').textContent = `${lowHr.toFixed(1)}–${highHr.toFixed(1)} hr`;
+  document.getElementById('resultTop').textContent = "ESTIMATED COOK TIME";
+
+  if(!timeVal){
+    document.getElementById('resultWindow').textContent = "Set a time below to get a start/finish window";
+    document.getElementById('resultSub').textContent = "";
+    return;
+  }
+  const [hh,mm] = timeVal.split(":").map(Number);
+  const anchor = hh*60+mm;
+
+  if(mode === "start"){
+    const finishLow = anchor + lowHr*60;
+    const finishHigh = anchor + highHr*60;
+    document.getElementById('resultWindow').textContent = `Start at ${fmtTime(anchor)} → ready ${fmtTime(finishLow)}–${fmtTime(finishHigh)}`;
+  } else {
+    const startLow = anchor - highHr*60;
+    const startHigh = anchor - lowHr*60;
+    document.getElementById('resultWindow').textContent = `To eat at ${fmtTime(anchor)} → get it on between ${fmtTime(startLow)}–${fmtTime(startHigh)}`;
+  }
+  document.getElementById('resultSub').textContent = `Rest: ${meat.rest} · build that in on top of cook time`;
+}
+
+function initTabs(){
+  document.getElementById('tabs').addEventListener('click', (e) => {
+    const btn = e.target.closest('button[data-panel]');
+    if(!btn) return;
+    document.querySelectorAll('#tabs button').forEach(b => b.classList.toggle('active', b === btn));
+    document.querySelectorAll('section.panel').forEach(p => p.classList.toggle('active', p.id === `panel-${btn.dataset.panel}`));
+  });
+}
+
+function initCalc(){
+  populateCalc();
+  const now = new Date();
+  document.getElementById('calcTime').value = `${String(now.getHours()).padStart(2,"0")}:${String(now.getMinutes()).padStart(2,"0")}`;
+  ["calcMeat","calcWeight","calcTime"].forEach(id => document.getElementById(id).addEventListener('input', runCalc));
+  document.getElementById('calcMode').addEventListener('change', (e) => {
+    document.getElementById('calcTimeLabel').textContent = e.target.value === "start" ? "Start time" : "Serve time";
+    runCalc();
+  });
+  runCalc();
+}
+
+function initScore(){
+  const app = document.getElementById('sApp'), taste = document.getElementById('sTaste'), tender = document.getElementById('sTender');
+  const vApp = document.getElementById('vApp'), vTaste = document.getElementById('vTaste'), vTender = document.getElementById('vTender');
+  const total = document.getElementById('scoreTotal'), label = document.getElementById('scoreLabel');
+  function update(){
+    vApp.textContent = app.value; vTaste.textContent = taste.value; vTender.textContent = tender.value;
+    const t = Number(app.value) + Number(taste.value) + Number(tender.value);
+    total.innerHTML = `${t}<span style="font-size:16px;">/30</span>`;
+    label.textContent = t >= 27 ? "Table-stopper" : t >= 21 ? "Solid plate" : t >= 15 ? "Needs work" : "Back to the drawing board";
+    try{ localStorage.setItem('pitref-score', JSON.stringify({a:app.value,t:taste.value,d:tender.value})); }catch(e){}
+  }
+  [app,taste,tender].forEach(el => el.addEventListener('input', update));
+  try{
+    const saved = JSON.parse(localStorage.getItem('pitref-score'));
+    if(saved){ app.value = saved.a; taste.value = saved.t; tender.value = saved.d; }
+  }catch(e){}
+  update();
+}
+
+renderMeats();
+renderSauces();
+initSauceFilters();
+initTabs();
+initCalc();
+initScore();
+</script>
